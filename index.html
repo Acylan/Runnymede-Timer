@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Professional Exam Timer</title>
+  
+  <!-- 1. Load Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- 2. Custom CSS (Replaces Tailwind) -->
+  <style>
+    /* --- Base & Reset --- */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html {
+      height: 100%;
+    }
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      background-color: #0f172a; /* bg-slate-900 */
+      color: #cbd5e1; /* Default text color */
+      min-height: 100%;
+    }
+
+    /* --- Keyframes --- */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.5s ease-out;
+    }
+    
+    @keyframes pulse-light {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.5;
+      }
+    }
+    .animate-pulse-light {
+      animation: pulse-light 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    /* --- App Layout --- */
+    #app-wrapper {
+      min-height: 100vh;
+      background-image: linear-gradient(to bottom right, #0f172a, #0c2a5d, #0f172a); /* from-slate-900 via-blue-950 to-slate-900 */
+      position: relative;
+      overflow: hidden;
+    }
+    #logo-bg {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.3;
+      pointer-events: none;
+      font-size: 9rem; /* text-9xl */
+      font-weight: 700;
+      color: white;
+    }
+    .Runnymede-logo {
+        height: 618px;
+        width: 882px;
+    }
+    #content-wrapper {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    #main-content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    #controls-container {
+      width: 100%;
+      background-color: rgba(15, 23, 42, 0.8); /* bg-slate-900/80 */
+      backdrop-filter: blur(10px);
+      border-top: 2px solid rgba(59, 130, 246, 0.3); /* border-t-2 border-blue-500/30 */
+      box-shadow: 0 -10px 15px -3px rgba(0, 0, 0, 0.1), 0 -4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-2xl */
+    }
+    #controls-inner {
+      max-width: 64rem; /* container */
+      margin-left: auto;
+      margin-right: auto;
+      padding: 1.5rem 1rem;
+    }
+    #controls-inner > .v-stack { /* Vertical stack layout */
+      & > * + * { margin-top: 1.5rem; }
+    }
+
+    /* --- Typography & Title --- */
+    .title-block {
+      position: absolute;
+      text-align: center;
+      margin-bottom: 2rem;
+      top: 3rem   
+    }
+    .title-block.running {
+      position: relative;
+      top: auto;
+    }
+    .title-block h1 {
+      font-size: 3.75rem; /* text-5xl */
+      font-weight: 700;
+      color: white;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.025em; /* tracking-tight */
+    }
+    .title-block p {
+      font-size: 1.125rem; /* text-lg */
+      color: #bfdbfe; /* text-blue-200 */
+      margin-bottom: 1rem; 
+    }
+    @media (min-width: 768px) {
+      .title-block h1 { font-size: 4.5rem; } /* md:text-6xl */
+    }
+
+    /* --- Timer Display --- */
+    #timer-display-area {
+      text-align: center;
+    }
+    #timer-display-area > * + * { margin-top: 1.5rem; } /* space-y-6 */
+
+    #main-timer-box {
+      background-color: rgba(30, 41, 59, 0.5); /* bg-slate-800/50 */
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(59, 130, 246, 0.3); /* border-2 border-blue-500/30 */
+      border-radius: 1.5rem; /* rounded-3xl */
+      padding: 3rem; /* p-12 */
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* shadow-2xl */
+    }
+    #main-timer-label {
+      font-size: 0.875rem; /* text-sm */
+      text-transform: uppercase;
+      letter-spacing: 0.1em; /* tracking-widest */
+      color: #93c5fd; /* text-blue-300 */
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+    #main-timer-time {
+      font-size: 6rem; /* text-8xl */
+      font-weight: 700;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; /* font-mono */
+      transition: color 0.3s;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* drop-shadow-lg */
+    }
+    #main-time-complete-msg {
+      margin-top: 1.5rem;
+      font-size: 1.5rem; /* text-2xl */
+      font-weight: 600;
+      color: #f59e0b; /* text-amber-400 */
+      animation: pulse-light 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @media (min-width: 768px) {
+      #main-timer-time { font-size: 8rem; } /* md:text-9xl */
+    }
+
+    #extra-timer-box {
+      background-color: rgba(30, 41, 59, 0.5);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(71, 85, 105, 0.3); /* border-slate-600/30 */
+      border-radius: 1rem; /* rounded-2xl */
+      padding: 2rem; /* p-8 */
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* shadow-xl */
+      transition: all 0.5s;
+    }
+    #extra-timer-box.active {
+      border-color: rgba(245, 158, 11, 0.5); /* border-amber-500/50 */
+    }
+    #extra-timer-label {
+      font-size: 0.75rem; /* text-xs */
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #fcd34d; /* text-amber-300 */
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+    }
+    #extra-timer-time {
+      font-size: 3rem; /* text-5xl */
+      font-weight: 700;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      transition: color 0.3s;
+    }
+    #extra-time-complete-msg {
+      margin-top: 1rem;
+      font-size: 1.25rem; /* text-xl */
+      font-weight: 600;
+      color: #f87171; /* text-red-400 */
+      animation: pulse-light 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @media (min-width: 768px) {
+      #extra-timer-time { font-size: 3.75rem; } /* md:text-6xl */
+    }
+
+    /* --- Dynamic Color Classes --- */
+    .text-emerald-400 { color: #34d399; }
+    .text-amber-400 { color: #f59e0b; }
+    .text-red-400 { color: #f87171; }
+    .text-slate-500 { color: #64748b; }
+
+    /* --- Setup Area --- */
+    #setup-message {
+      text-align: center;
+      color: rgba(148, 190, 253, 0.7); /* text-blue-300/70 */
+      font-size: 1.125rem;
+    }
+    #setup-inputs-area > * + * { margin-top: 1.5rem; } /* space-y-6 */
+    
+    .grid-2-col {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem; /* gap-6 */
+    }
+    @media (min-width: 768px) {
+      .grid-2-col { grid-template-columns: repeat(2, 1fr); } /* md:grid-cols-2 */
+    }
+    
+    .input-group > * + * { margin-top: 0.5rem; } /* space-y-2 */
+
+    label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      color: #bfdbfe; /* text-blue-200 */
+    }
+    label[for="extra-time"] {
+      color: #fde68a; /* text-amber-200 */
+    }
+
+    input[type="number"] {
+      width: 100%;
+      background-color: rgba(51, 65, 85, 0.5); /* bg-slate-700/50 */
+      border: 1px solid rgba(59, 130, 246, 0.3); /* border-blue-500/30 */
+      color: white;
+      font-size: 1.125rem; /* text-lg */
+      height: 3rem; /* h-12 */
+      border-radius: 0.375rem; /* rounded-md */
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
+    input[type="number"]#extra-time {
+      border-color: rgba(245, 158, 11, 0.3); /* border-amber-500/30 */
+    }
+    input[type="number"]::placeholder {
+      color: #94a3b8;
+    }
+    input[type="number"]:focus {
+      outline: 2px solid #2563eb;
+      outline-offset: 2px;
+    }
+
+    .preview-box {
+      background-color: rgba(30, 41, 59, 0.5); /* bg-slate-800/50 */
+      border-radius: 0.75rem; /* rounded-xl */
+      padding: 1rem;
+      border: 1px solid rgba(59, 130, 246, 0.2); /* border-blue-500/20 */
+    }
+    .preview-box > div:first-child {
+      color: #bfdbfe; /* text-blue-200 */
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+    }
+    .preview-box > div:last-child {
+      font-size: 1.875rem; /* text-3xl */
+      font-weight: 700;
+      color: white;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    .preview-box.preview-box-extra {
+      border-color: rgba(245, 158, 11, 0.2); /* border-amber-500/20 */
+    }
+    .preview-box.preview-box-extra > div:first-child {
+      color: #fde68a; /* text-amber-200 */
+    }
+
+    /* --- Buttons --- */
+    .button-group {
+      display: flex;
+      gap: 1rem;
+    }
+    .btn {
+      flex-grow: 1;
+      height: 3.5rem; /* h-14 */
+      font-size: 1.125rem; /* text-lg */
+      transition: all 0.3s;
+      border-radius: 0.375rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      font-weight: 600;
+      border: none;
+    }
+    #start-btn {
+      background-image: linear-gradient(to right, #2563eb, #1d4ed8); /* from-blue-600 to-blue-700 */
+      color: white;
+      box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.3); /* shadow-lg shadow-blue-500/30 */
+    }
+    #start-btn:hover {
+      background-image: linear-gradient(to right, #1d4ed8, #1e40af); /* hover:from-blue-700 hover:to-blue-800 */
+    }
+    #pause-btn {
+      border: 2px solid rgba(59, 130, 246, 0.5); /* border-2 border-blue-500/50 */
+      background-color: rgba(51, 65, 85, 0.5); /* bg-slate-700/50 */
+      color: white;
+    }
+    #pause-btn:hover {
+      background-color: #334155; /* hover:bg-slate-700 */
+    }
+    #reset-btn {
+      border: 2px solid rgba(239, 68, 68, 0.5); /* border-2 border-red-500/50 */
+      background-color: rgba(51, 65, 85, 0.5);
+      color: white;
+    }
+    #reset-btn:hover {
+      background-color: rgba(127, 29, 29, 0.3); /* hover:bg-red-900/30 */
+    }
+
+    /* --- Status & Icons --- */
+    #status-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      color: #93c5fd; /* text-blue-300 */
+    }
+    #status-dot {
+      width: 0.75rem; /* w-3 */
+      height: 0.75rem; /* h-3 */
+      border-radius: 9999px; /* rounded-full */
+    }
+    .status-dot-running {
+      background-color: #34d399; /* bg-emerald-400 */
+      animation: pulse-light 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    .status-dot-paused {
+      background-color: #f59e0b; /* bg-amber-400 */
+    }
+    #status-text {
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    i[data-lucide] {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+    }
+    .icon-sm {
+      width: 1rem; /* w-4 */
+      height: 1rem; /* h-4 */
+    }
+    .icon-lg {
+      width: 1.25rem; /* w-5 */
+      height: 1.25rem; /* h-5 */
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- 
+    Main Application Wrapper
+  -->
+  <div id="app-wrapper">
+    
+    <!-- Background Logo Area -->
+    <div id="logo-bg">
+      <img src="./assets/Runnymede Logo.png" alt="Runnymede Logo" class="Runnymede-logo">
+    </div>
+
+    <div id="content-wrapper">
+      <!-- Main Content Area - Centered -->
+      <div id="main-content">
+        <!-- Title -->
+        <div class="title-block">
+          <h1>Exam Timer</h1>
+          <p>Professional Exam Time Management</p>
+            <div id="setup-message">
+                Set your exam times below and click start to begin
+            </div>          
+        </div>
+
+        <!-- 
+          Main Timer Display (Visible when timer is running)
+        -->
+        <div id="timer-display-area" class="animate-fade-in" style="display: none;">
+          <!-- Main Exam Timer -->
+          <div id="main-timer-box">
+            <div id="main-timer-label">
+              Exam Time Remaining
+            </div>
+            <div id="main-timer-time" class="text-emerald-400">
+              00:00:00
+            </div>
+            <div id="main-time-complete-msg" style="display: none;">
+              Main Time Complete - Extra Time Starting!
+            </div>
+          </div>
+
+          <!-- Extra Time Timer -->
+          <div id="extra-timer-box">
+            <div id="extra-timer-label">
+              Extra Time Available
+            </div>
+            <div id="extra-timer-time" class="text-slate-500">
+              00:00:00
+            </div>
+            <div id="extra-time-complete-msg" style="display: none;">
+              ALL TIME UP!
+            </div>
+          </div>
+        </div>
+
+        <!-- 
+          Setup Message (Visible when timer is not running)
+        -->
+      </div>
+
+      <!-- Bottom Controls Container -->
+      <div id="controls-container">
+        <div id="controls-inner">
+          <div class="v-stack">
+            
+            <!-- 
+              Time Inputs (Visible when timer is not running)
+            -->
+            <div id="setup-inputs-area" class="v-stack">
+              <div class="grid-2-col">
+                <div class="input-group">
+                  <label for="exam-duration">
+                    <i data-lucide="clock" class="icon-sm"></i>
+                    Exam Duration (minutes)
+                  </label>
+                  <input
+                    id="exam-duration"
+                    type="number"
+                    min="1"
+                    value="120"
+                    placeholder="120"
+                  />
+                </div>
+
+                <div class="input-group">
+                  <label for="extra-time">
+                    <i data-lucide="plus" class="icon-sm"></i>
+                    Extra Time (minutes)
+                  </label>
+                  <input
+                    id="extra-time"
+                    type="number"
+                    min="0"
+                    value="30"
+                    placeholder="30"
+                  />
+                </div>
+              </div>
+
+              <!-- Timer Preview -->
+              <div class="grid-2-col">
+                <div class="preview-box">
+                  <div>Exam Duration:</div>
+                  <div id="preview-main-time">02:00:00</div>
+                </div>
+                <div class="preview-box preview-box-extra">
+                  <div>Extra Time:</div>
+                  <div id="preview-extra-time">00:30:00</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Control Buttons -->
+            <div class="button-group">
+              <!-- Start Button -->
+              <button id="start-btn" class="btn">
+                <i data-lucide="play" class="icon-lg"></i>
+                Start Timer
+              </button>
+              
+              <!-- Pause Button -->
+              <button id="pause-btn" class="btn" style="display: none;">
+                <i data-lucide="pause" class="icon-lg"></i>
+                <span>Pause</span>
+              </button>
+              
+              <!-- Reset Button -->
+              <button id="reset-btn" class="btn" style="display: none;">
+                <i data-lucide="rotate-ccw" class="icon-lg"></i>
+                Reset
+              </button>
+            </div>
+
+            <!-- 
+              Status Indicator (Visible when timer is running)
+            -->
+            <div id="status-indicator" style="display: none;">
+              <div id="status-dot"></div>
+              <span id="status-text">
+                Timer Running
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 3. JavaScript Logic (Updated for plain CSS)
+    document.addEventListener('DOMContentLoaded', () => {
+
+      // --- DOM Element References ---
+      const timerDisplayArea = document.getElementById('timer-display-area');
+      const mainTimerLabel = document.getElementById('main-timer-label');
+      const mainTimerTime = document.getElementById('main-timer-time');
+      const mainTimeCompleteMsg = document.getElementById('main-time-complete-msg');
+      const extraTimerBox = document.getElementById('extra-timer-box');
+      const extraTimerLabel = document.getElementById('extra-timer-label');
+      const extraTimerTime = document.getElementById('extra-timer-time');
+      const extraTimeCompleteMsg = document.getElementById('extra-time-complete-msg');
+      
+      const setupMessage = document.getElementById('setup-message');
+      const setupInputsArea = document.getElementById('setup-inputs-area');
+      
+      const examDurationInput = document.getElementById('exam-duration');
+      const extraTimeInput = document.getElementById('extra-time');
+      const previewMainTime = document.getElementById('preview-main-time');
+      const previewExtraTime = document.getElementById('preview-extra-time');
+      
+      const startBtn = document.getElementById('start-btn');
+      const pauseBtn = document.getElementById('pause-btn');
+      const resetBtn = document.getElementById('reset-btn');
+      
+      const statusIndicator = document.getElementById('status-indicator');
+      const statusDot = document.getElementById('status-dot');
+      const statusText = document.getElementById('status-text');
+
+      const title = document.querySelector(".title-block")
+
+      // --- State Variables ---
+      let examDuration = '120'; // in minutes
+      let extraTime = '30'; // in minutes
+      let isRunning = false;
+      let mainTimeRemaining = 0; // in seconds
+      let extraTimeRemaining = 0; // in seconds
+      let isExtraTime = false;
+      let isPaused = false;
+      
+      // --- Timer Reference ---
+      let intervalRef = null;
+
+      // --- Helper Functions ---
+
+      const calculateExamTime = () => {
+        const duration = parseInt(examDuration) || 0;
+        return duration * 60;
+      };
+
+      const calculateExtraTimeSeconds = () => {
+        const extra = parseInt(extraTime) || 0;
+        return extra * 60;
+      };
+
+      const formatTime = (seconds) => {
+        const hrs = Math.floor(seconds / 3600);
+        const mins = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      };
+
+      // Get *class name* for main timer
+      const getMainTimeColorClass = () => {
+        const totalTime = calculateExamTime();
+        if (totalTime === 0) return 'text-emerald-400';
+        const percentage = (mainTimeRemaining / totalTime) * 100;
+        
+        if (percentage > 50) return 'text-emerald-400';
+        if (percentage > 20) return 'text-amber-400';
+        return 'text-red-400';
+      };
+
+      // Get *class name* for extra timer
+      const getExtraTimeColorClass = () => {
+        return 'text-amber-400';
+      };
+      
+      // --- UI Update Function ---
+      
+      const updateUI = () => {
+        // Update timer displays
+        mainTimerTime.textContent = formatTime(mainTimeRemaining);
+        extraTimerTime.textContent = formatTime(extraTimeRemaining);
+        
+        // Update timer colors
+        mainTimerTime.classList.remove('text-emerald-400', 'text-amber-400', 'text-red-400');
+        mainTimerTime.classList.add(getMainTimeColorClass());
+        
+        // Toggle UI sections based on isRunning
+        if (isRunning) {
+          timerDisplayArea.style.display = 'block';
+          timerDisplayArea.classList.add('animate-fade-in');
+          setupMessage.style.display = 'none';
+          setupInputsArea.style.display = 'none';
+          
+          startBtn.style.display = 'none';
+          pauseBtn.style.display = 'flex';
+          resetBtn.style.display = 'flex';
+          statusIndicator.style.display = 'flex';
+
+          title.classList.add("running")
+        } else {
+          timerDisplayArea.style.display = 'none';
+          timerDisplayArea.classList.remove('animate-fade-in');
+          setupMessage.style.display = 'block';
+          setupInputsArea.style.display = 'block';
+          
+          startBtn.style.display = 'flex';
+          pauseBtn.style.display = 'none';
+          resetBtn.style.display = 'none';
+          statusIndicator.style.display = 'none';
+          
+          title.classList.remove("running")
+          // Reset previews
+          updateTimePreviews();
+        }
+        
+        // Update UI based on isPaused
+        if (isPaused) {
+          pauseBtn.innerHTML = `
+            <i data-lucide="play" class="icon-lg"></i>
+            <span>Resume</span>
+          `;
+          statusDot.className = 'status-dot-paused';
+          statusText.textContent = 'Timer Paused';
+        } else {
+          pauseBtn.innerHTML = `
+            <i data-lucide="pause" class="icon-lg"></i>
+            <span>Pause</span>
+          `;
+          statusDot.className = 'status-dot-running animate-pulse-light';
+          statusText.textContent = 'Timer Running';
+        }
+        
+        // Update UI based on isExtraTime
+        extraTimerTime.classList.remove('text-amber-400', 'text-slate-500');
+        if (isExtraTime) {
+          mainTimerLabel.textContent = 'Main Exam Time';
+          extraTimerBox.classList.add('active');
+          extraTimerLabel.textContent = 'Extra Time Remaining';
+          extraTimerTime.classList.add(getExtraTimeColorClass());
+
+          if (mainTimeRemaining === 0) {
+            mainTimeCompleteMsg.style.display = 'block';
+          }
+          if (extraTimeRemaining === 0) {
+            extraTimeCompleteMsg.style.display = 'block';
+          }
+
+        } else {
+          // Reset to default
+          mainTimerLabel.textContent = 'Exam Time Remaining';
+          extraTimerBox.classList.remove('active');
+          extraTimerLabel.textContent = 'Extra Time Available';
+          extraTimerTime.classList.add('text-slate-500');
+          
+          mainTimeCompleteMsg.style.display = 'none';
+          extraTimeCompleteMsg.style.display = 'none';
+        }
+        
+        // Re-create icons after updating innerHTML
+        lucide.createIcons();
+      };
+      
+      // --- Timer Logic ---
+      
+      const tick = () => {
+        if (isPaused || !isRunning) {
+          return; // Do nothing if paused or stopped
+        }
+
+        if (!isExtraTime && mainTimeRemaining > 0) {
+          // Main exam timer
+          mainTimeRemaining--;
+          if (mainTimeRemaining === 0) {
+            isExtraTime = true;
+          }
+        } else if (isExtraTime && extraTimeRemaining > 0) {
+          // Extra time timer
+          extraTimeRemaining--;
+          if (extraTimeRemaining === 0) {
+            // Timer finished
+            isRunning = false;
+            if (intervalRef) {
+              clearInterval(intervalRef);
+              intervalRef = null;
+            }
+          }
+        } else if (mainTimeRemaining === 0 && extraTimeRemaining === 0) {
+          // Failsafe stop
+          isRunning = false;
+          if (intervalRef) {
+            clearInterval(intervalRef);
+            intervalRef = null;
+          }
+        }
+        
+        // Update the UI on every tick
+        updateUI();
+      };
+
+      // --- Control Functions ---
+      
+      const startTimer = () => {
+        const examTime = calculateExamTime();
+        const extra = calculateExtraTimeSeconds();
+        
+        mainTimeRemaining = examTime;
+        extraTimeRemaining = extra;
+        
+        if(mainTimeRemaining === 0) {
+            console.error("Cannot start timer with 0 duration.");
+            return;
+        }
+
+        isExtraTime = false;
+        isRunning = true;
+        isPaused = false;
+        
+        if (intervalRef) {
+          clearInterval(intervalRef);
+        }
+        
+        intervalRef = setInterval(tick, 1000);
+        updateUI();
+      };
+
+      const pauseTimer = () => {
+        isPaused = !isPaused;
+        updateUI();
+      };
+
+      const resetTimer = () => {
+        if (intervalRef) {
+          clearInterval(intervalRef);
+          intervalRef = null;
+        }
+        
+        isRunning = false;
+        isPaused = false;
+        mainTimeRemaining = 0;
+        extraTimeRemaining = 0;
+        isExtraTime = false;
+        
+        updateUI();
+      };
+      
+      // --- Input Previews ---
+      
+      const updateTimePreviews = () => {
+        examDuration = examDurationInput.value;
+        extraTime = extraTimeInput.value;
+        
+        previewMainTime.textContent = formatTime(calculateExamTime());
+        previewExtraTime.textContent = formatTime(calculateExtraTimeSeconds());
+      };
+
+      // --- Event Listeners ---
+      startBtn.addEventListener('click', startTimer);
+      pauseBtn.addEventListener('click', pauseTimer);
+      resetBtn.addEventListener('click', resetTimer);
+      
+      examDurationInput.addEventListener('input', updateTimePreviews);
+      extraTimeInput.addEventListener('input', updateTimePreviews);
+      
+      // --- Initial Setup ---
+      updateTimePreviews(); // Set initial preview times
+      lucide.createIcons(); // Initial icon render
+      updateUI(); // Set initial UI state
+    });
+  </script>
+
+</body>
+</html>
