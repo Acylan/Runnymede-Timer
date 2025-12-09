@@ -3,313 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exam Timer & Display</title>
-    <!-- Load Tailwind CSS via CDN -->
+    <title>Static Clock Exam Timer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom styles for the app */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Roboto+Mono:wght@400;700&display=swap');
-
-        :root {
-            font-family: 'Inter', sans-serif;
+        /* Custom styles to mimic the blue time display glow */
+        .time-shadow-primary {
+            text-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
         }
-
-        /* Enforce Roboto Mono for time displays */
-        .font-mono {
-            font-family: 'Roboto Mono', monospace;
-        }
-
-        /* Style for the time input indicator (to ensure text is visible) */
+        /* Style adjustments to make the time input look consistent on dark mode */
         input[type="time"]::-webkit-calendar-picker-indicator {
             filter: invert(1);
-            cursor: pointer;
-            opacity: 0.7;
         }
-        input[type="time"]::-moz-placeholder {
-            opacity: 0;
+        /* Utility classes from Shadcn/ui context */
+        .shadcn-input {
+            display: flex;
+            width: 100%;
+            border-radius: 0.375rem; /* rounded-md */
+            padding: 0.25rem 0.5rem;
+            font-size: 1rem;
+            line-height: 1.5rem;
+            --tw-ring-offset-width: 0px;
+            --tw-ring-color: transparent;
         }
-        
-        /* Utility for fade-in effect */
-        .fade-in {
-            animation: fadeIn 0.5s ease-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+        .shadcn-label {
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 500; /* font-medium */
+            line-height: 1.25rem;
         }
     </style>
 </head>
-<body class="min-h-screen bg-slate-900 antialiased">
+<body class="bg-slate-900">
 
     <div id="app" class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white p-4 flex flex-col items-center justify-center relative overflow-hidden">
         
-        <!-- --- JavaScript Variables & Logic --- -->
-        <script>
-            // State variables
-            let examName = '';
-            let centerNumber = '';
-            let paperCode = '';
-            let startTime = '09:00';
-            let duration = '120'; // Duration in minutes
-            let isRunning = false;
-            let currentTime = '';
-
-            // PASTE YOUR LOGO URL HERE (using a Google Logo placeholder)
-            const LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/768px-Google_%22G%22_logo.svg.png"; 
-            
-            let timeInterval;
-
-            // Utility functions for icons (Lucide SVG source for simplicity)
-            const icons = {
-                Play: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`,
-                RotateCcw: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.744 2.89L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.744-2.89L3 16"></path><path d="M3 21v-5h5"></path></svg>`,
-                Clock: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
-                FileText: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>`,
-                Hash: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="9" y2="9"></line><line x1="4" x2="20" y1="15" y2="15"></line><line x1="10" x2="8" y1="3" y2="21"></line><line x1="16" x2="14" y1="3" y2="21"></line></svg>`,
-                BookOpen: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>`
-            };
-
-            // Calculate end time utility
-            const calculateTime = (start, minutesToAdd) => {
-                if (!start || !minutesToAdd) return '--:--';
-                const [hours, minutes] = start.split(':').map(Number);
-                const date = new Date();
-                date.setHours(hours, minutes, 0, 0);
-                date.setMinutes(date.getMinutes() + Math.round(Number(minutesToAdd)));
-                // Use en-GB to get 24hr format HH:MM
-                return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-            };
-
-            // Function to update the digital clock and display
-            const updateCurrentTime = () => {
-                const now = new Date();
-                // Format: HH:MM:SS (24-hour)
-                currentTime = now.toLocaleTimeString('en-GB', { 
-                    hour12: false,
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
-                });
-                
-                const display = document.getElementById('currentTimeDisplay');
-                if (display) {
-                    display.textContent = currentTime;
-                }
-            };
-
-            // Renders dynamic elements based on current state
-            const renderApp = () => {
-                const setupSection = document.getElementById('setup-section');
-                const displaySection = document.getElementById('display-section');
-                const headerTitle = document.getElementById('header-title');
-                const infoBar = document.getElementById('info-bar');
-
-                // 1. Toggle visibility
-                if (isRunning) {
-                    setupSection.classList.add('hidden');
-                    displaySection.classList.remove('hidden');
-                    displaySection.classList.add('fade-in');
-                    
-                    // Start time interval if not running
-                    if (!timeInterval) {
-                        timeInterval = setInterval(updateCurrentTime, 1000);
-                    }
-
-                    // Update display times
-                    const endTime = calculateTime(startTime, duration);
-                    const extraDuration = Math.round(Number(duration) * 1.25);
-                    const extraEndTime = calculateTime(startTime, extraDuration);
-                    
-                    document.getElementById('displayExamName').textContent = examName || 'EXAM IN PROGRESS';
-                    document.getElementById('displayStartTime').textContent = startTime;
-                    document.getElementById('displayEndTime').textContent = endTime;
-                    document.getElementById('displayExtraEndTime').textContent = extraEndTime;
-                    
-                    document.getElementById('displayCenterNumber').textContent = centerNumber;
-                    document.getElementById('displayPaperCode').textContent = paperCode;
-
-                } else {
-                    setupSection.classList.remove('hidden');
-                    setupSection.classList.add('fade-in');
-                    displaySection.classList.add('hidden');
-                    
-                    // Clear interval
-                    clearInterval(timeInterval);
-                    timeInterval = null;
-                }
-
-                // 2. Update Header
-                headerTitle.textContent = isRunning ? (examName || 'Exam In Progress') : 'Exam Timer Setup';
-
-                // 3. Update Info Bar
-                if (isRunning && (centerNumber || paperCode)) {
-                    infoBar.classList.remove('hidden');
-                } else {
-                    infoBar.classList.add('hidden');
-                }
-
-                // 4. Update Extra Info Display in Setup Mode
-                const durationInput = document.getElementById('duration');
-                const durationNum = Number(durationInput.value);
-                
-                const currentEndTime = calculateTime(startTime, durationNum);
-                const currentExtraDuration = Math.round(durationNum * 1.25);
-                const currentExtraEndTime = calculateTime(startTime, currentExtraDuration);
-
-                document.getElementById('endTimeDisplay').textContent = currentEndTime;
-                document.getElementById('extraEndTimeDisplay').textContent = currentExtraEndTime;
-            };
-
-            // Handlers
-            const handleStart = () => {
-                // Read current values from inputs
-                examName = document.getElementById('examName').value.trim();
-                centerNumber = document.getElementById('centerNumber').value.trim();
-                paperCode = document.getElementById('paperCode').value.trim();
-                startTime = document.getElementById('startTime').value.trim();
-                duration = document.getElementById('duration').value.trim();
-                
-                // Set running state
-                isRunning = true;
-                renderApp();
-            };
-
-            const handleReset = () => {
-                isRunning = false;
-                renderApp();
-            };
-
-            // Event listeners for input changes in setup mode
-            const setupListeners = () => {
-                document.getElementById('startTime').addEventListener('input', (e) => {
-                    startTime = e.target.value;
-                    renderApp();
-                });
-                document.getElementById('duration').addEventListener('input', (e) => {
-                    duration = e.target.value;
-                    renderApp();
-                });
-                // Initial time setup on load
-                updateCurrentTime();
-                renderApp();
-            };
-
-            window.onload = setupListeners;
-        </script>
-        
-        <!-- --- Background Logo --- -->
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden z-0">
             <img 
-                id="bg-logo"
-                src="${LOGO_URL}" 
+                src="./assets/Runnymede Logo.png" 
                 alt="Exam Logo" 
-                class="max-w-[80%] max-h-[80%] object-contain opacity-10 blur-sm"
+                class="w-[1176px] h-[924px] object-contain opacity-40 blur-sm"
             />
         </div>
 
-        <!-- --- Main Content Area --- -->
         <div class="relative z-10 w-full max-w-7xl space-y-8">
-            
-            <!-- --- Header Area --- -->
             <div class="text-center space-y-4">
                 <h1 id="header-title" class="text-5xl md:text-7xl font-bold tracking-tight text-white drop-shadow-lg">
                     Exam Timer Setup
                 </h1>
-                
-                <p id="header-subtitle" class="text-blue-200 text-lg">Configure your exam details and schedule</p>
-                
-                <!-- Info Bar (Hidden in Setup Mode) -->
-                <div id="info-bar" class="hidden flex items-center justify-center gap-8 text-2xl text-blue-100 mt-4 bg-white/5 inline-flex px-8 py-3 rounded-full backdrop-blur-sm border border-white/10 whitespace-nowrap">
-                    <div id="center-info" class="flex items-center gap-3">
-                        <span class="uppercase tracking-widest text-xs font-semibold opacity-60">Center No</span>
-                        <span id="displayCenterNumber" class="font-mono font-bold tracking-wider"></span>
+                <div id="header-info">
+                    <p class="text-blue-200 text-lg">Configure your exam details and schedule</p>
+                </div>
+            </div>
+
+            <div id="running-state" class="hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                    <div class="col-span-1 lg:col-span-2 bg-slate-800/40 backdrop-blur-xl border-2 border-blue-400/30 shadow-2xl overflow-hidden rounded-xl">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 opacity-50"></div>
+                        <div class="flex flex-col items-center justify-center p-12 md:p-16">
+                            <div class="text-lg uppercase tracking-[0.2em] text-blue-300 mb-6 font-semibold flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                CURRENT TIME
+                            </div>
+                            <div id="current-system-time-display" class="text-8xl md:text-[10rem] leading-none font-mono font-bold text-white tracking-wider time-shadow-primary">
+                                00:00:00
+                            </div>
+                        </div>
                     </div>
-                    <div class="w-px bg-white/20 h-8 self-center" />
-                    <div id="paper-info" class="flex items-center gap-3">
-                        <span class="uppercase tracking-widest text-xs font-semibold opacity-60">Paper Code</span>
-                        <span id="displayPaperCode" class="font-mono font-bold tracking-wider"></span>
+
+                    <div class="col-span-1 lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
+                        
+                        <div class="bg-slate-800/40 backdrop-blur-xl border border-green-500/20 shadow-xl rounded-xl">
+                            <div class="flex flex-col items-center justify-center p-8">
+                                <div class="text-sm uppercase tracking-widest text-green-400/80 mb-3 font-semibold">Start Time</div>
+                                <div id="start-time-display" class="text-6xl font-mono font-bold text-white drop-shadow-md">
+                                    09:00
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800/40 backdrop-blur-xl border border-blue-500/20 shadow-xl rounded-xl">
+                            <div class="flex flex-col items-center justify-center p-8">
+                                <div class="text-sm uppercase tracking-widest text-blue-400/80 mb-3 font-semibold">End Time</div>
+                                <div id="end-time-display" class="text-6xl font-mono font-bold text-white drop-shadow-md">
+                                    11:00
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800/40 backdrop-blur-xl border border-amber-500/20 shadow-xl rounded-xl">
+                            <div class="flex flex-col items-center justify-center p-8">
+                                <div class="text-sm uppercase tracking-widest text-amber-400/80 mb-3 font-semibold">Extra Time End</div>
+                                <div id="extra-end-time-display" class="text-6xl font-mono font-bold text-white drop-shadow-md">
+                                    11:30
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-span-1 lg:col-span-2 flex justify-center mt-4">
+                        <button 
+                            onclick="resetExam()"
+                            class="text-slate-400 hover:text-white hover:bg-white/5 transition-colors p-3 rounded-lg flex items-center"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6"/><path d="M21.1 17.5a9 9 0 1 1-2.2-8.5"/><path d="M21.5 2l-4 4"/></svg>
+                            Reset / Configure New Exam
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- ------------------------------------------------ -->
-            <!-- --- SECTION 1: EXAM SETUP FORM (Initial View) --- -->
-            <!-- ------------------------------------------------ -->
-            <div id="setup-section" class="w-full">
-                <div class="bg-slate-800/60 backdrop-blur-xl border-slate-700 shadow-2xl max-w-4xl mx-auto rounded-xl">
+            <div id="setup-state" class="">
+                <div class="bg-slate-800/60 backdrop-blur-xl border border-slate-700 shadow-2xl max-w-4xl mx-auto rounded-xl">
                     <div class="p-8 md:p-10 space-y-8">
                         <div class="space-y-8">
-                            <!-- Top Row: Name and Start Time -->
                             <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
                                 <div class="md:col-span-8 space-y-2">
-                                    <label class="text-blue-200 block text-sm font-medium">Exam Name / Subject</label>
+                                    <label class="shadcn-label text-blue-200">Exam Name / Subject</label>
                                     <div class="relative">
-                                        <span class="absolute left-3 top-3.5 h-4 w-4 text-slate-400 opacity-80"><!-- BookOpen Icon -->${icons.BookOpen}</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-3.5 h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20h-5.5"/><path d="M18 6h-8"/><path d="M18 10h-8"/><path d="M12 14h-2"/></svg>
                                         <input 
-                                            id="examName"
                                             type="text"
-                                            value=""
-                                            class="pl-9 bg-slate-900/50 border-slate-600 text-white w-full h-11 text-lg rounded-lg focus:border-blue-500 transition-colors focus:ring-0"
+                                            id="exam-name-input"
+                                            value="A-Level Maths"
+                                            class="shadcn-input pl-9 bg-slate-900/50 border-slate-600 text-white h-11 text-lg focus:border-blue-500 transition-colors"
                                             placeholder="e.g. Mathematics Paper 1"
                                         />
                                     </div>
                                 </div>
                                 <div class="md:col-span-4 space-y-2">
-                                    <label class="text-green-300 block text-sm font-medium">Starting Time</label>
+                                    <label class="shadcn-label text-green-300">Starting Time</label>
                                     <div class="relative">
-                                        <span class="absolute left-3 top-3.5 h-4 w-4 text-slate-400 opacity-80"><!-- Clock Icon -->${icons.Clock}</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-3.5 h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                         <input 
-                                            id="startTime"
                                             type="time"
+                                            id="start-time-input"
                                             value="09:00"
-                                            class="pl-9 bg-slate-900/50 border-green-500/30 text-white w-full h-11 font-mono text-lg rounded-lg focus:ring-0"
+                                            oninput="updateSetupTimes()"
+                                            class="shadcn-input pl-9 bg-slate-900/50 border-green-500/30 text-white h-11 font-mono text-lg"
                                         />
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Bottom Row: Center, Paper, Duration -->
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div class="space-y-2">
-                                    <label class="text-blue-200 block text-sm font-medium">Center Number</label>
+                                    <label class="shadcn-label text-blue-200">Center Number</label>
                                     <div class="relative">
-                                        <span class="absolute left-3 top-3.5 h-4 w-4 text-slate-400 opacity-80"><!-- Hash Icon -->${icons.Hash}</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-3.5 h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
                                         <input 
-                                            id="centerNumber"
                                             type="text"
-                                            value=""
-                                            class="pl-9 bg-slate-900/50 border-slate-600 text-white w-full h-11 rounded-lg focus:border-blue-500 transition-colors focus:ring-0"
+                                            id="center-number-input"
+                                            value="12345"
+                                            class="shadcn-input pl-9 bg-slate-900/50 border-slate-600 text-white h-11"
                                             placeholder="12345"
                                         />
                                     </div>
                                 </div>
                                 <div class="space-y-2">
-                                    <label class="text-blue-200 block text-sm font-medium">Paper / Unit Code</label>
+                                    <label class="shadcn-label text-blue-200">Paper / Unit Code</label>
                                     <div class="relative">
-                                        <span class="absolute left-3 top-3.5 h-4 w-4 text-slate-400 opacity-80"><!-- FileText Icon -->${icons.FileText}</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-3.5 h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
                                         <input 
-                                            id="paperCode"
                                             type="text"
-                                            value=""
-                                            class="pl-9 bg-slate-900/50 border-slate-600 text-white w-full h-11 rounded-lg focus:border-blue-500 transition-colors focus:ring-0"
+                                            id="paper-code-input"
+                                            value="9709/12"
+                                            class="shadcn-input pl-9 bg-slate-900/50 border-slate-600 text-white h-11"
                                             placeholder="9709/12"
                                         />
                                     </div>
                                 </div>
                                 <div class="space-y-2">
-                                    <label class="text-blue-300 block text-sm font-medium">Duration (Minutes)</label>
-                                    <div class="flex items-center gap-3 bg-slate-900/50 border border-blue-500/30 rounded-lg p-1 pr-3 h-11">
+                                    <label class="shadcn-label text-blue-300">Duration (Minutes)</label>
+                                    <div class="flex items-center gap-3 bg-slate-900/50 border border-blue-500/30 rounded-md p-1 pr-3 h-11">
                                         <input 
-                                            id="duration"
                                             type="number"
+                                            id="duration-input"
                                             value="120"
-                                            class="bg-transparent border-0 text-white h-full w-20 text-center font-mono focus-visible:ring-0 focus-visible:ring-offset-0 text-lg"
+                                            oninput="updateSetupTimes()"
+                                            class="bg-transparent border-0 text-white h-full w-20 text-center font-mono focus-visible:ring-0 focus-visible:ring-offset-0 text-lg shadcn-input"
                                             placeholder="60"
                                         />
-                                        <div class="h-6 w-px bg-slate-700 mx-1" />
+                                        <div class="h-6 w-px bg-slate-700 mx-1"></div>
                                         <div class="flex flex-col text-xs leading-tight whitespace-nowrap">
-                                            <span class="text-blue-200">End: <span id="endTimeDisplay" class="font-mono font-bold text-white">11:00</span></span>
-                                            <span class="text-amber-200">Extra: <span id="extraEndTimeDisplay" class="font-mono font-bold text-white">11:30</span></span>
+                                            <span class="text-blue-200">End: <span id="setup-end-time" class="font-mono font-bold text-white">11:00</span></span>
+                                            <span class="text-amber-200">Extra: <span id="setup-extra-end-time" class="font-mono font-bold text-white">11:30</span></span>
                                         </div>
                                     </div>
                                 </div>
@@ -318,83 +194,131 @@
 
                         <div class="pt-4">
                             <button 
-                                onclick="handleStart()"
-                                class="w-full h-14 text-xl font-bold rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-500/25 transition-all duration-300 transform hover:scale-[1.01] flex items-center justify-center"
+                                onclick="startExam()"
+                                type="button"
+                                class="w-full h-14 text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-500/25 transition-all duration-300 transform hover:scale-[1.01] rounded-lg flex items-center justify-center"
                             >
-                                <span class="w-6 h-6 mr-2 fill-current">${icons.Play}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-2 fill-current" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                                 START EXAM DISPLAY
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- ----------------------------------------------- -->
-            <!-- --- SECTION 2: EXAM DISPLAY (Running View) --- -->
-            <!-- ----------------------------------------------- -->
-            <div id="display-section" class="hidden w-full max-w-6xl mx-auto">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    
-                    <!-- Current Time - Primary Display -->
-                    <div class="col-span-1 lg:col-span-2 bg-slate-800/40 backdrop-blur-xl border-2 border-blue-400/30 shadow-2xl overflow-hidden rounded-xl">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 opacity-50" />
-                        <div class="flex flex-col items-center justify-center p-12 md:p-16">
-                            <div class="text-lg uppercase tracking-[0.2em] text-blue-300 mb-6 font-semibold">Current Time</div>
-                            <div id="currentTimeDisplay" class="text-8xl md:text-[10rem] leading-none font-mono font-bold text-white tracking-wider drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]">
-                                --:--:--
-                            </div>
-                            <h2 id="displayExamName" class="text-3xl text-white mt-6 font-semibold"></h2>
-                        </div>
-                    </div>
-
-                    <!-- Secondary Times Grid -->
-                    <div class="col-span-1 lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
-                        
-                        <!-- Start Time -->
-                        <div class="bg-slate-800/40 backdrop-blur-xl border border-green-500/20 shadow-xl rounded-xl">
-                            <div class="flex flex-col items-center justify-center p-8">
-                                <div class="text-sm uppercase tracking-widest text-green-400/80 mb-3 font-semibold">Start Time</div>
-                                <div id="displayStartTime" class="text-6xl font-mono font-bold text-white drop-shadow-md">
-                                    --:--
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- End Time -->
-                        <div class="bg-slate-800/40 backdrop-blur-xl border border-blue-500/20 shadow-xl rounded-xl">
-                            <div class="flex flex-col items-center justify-center p-8">
-                                <div class="text-sm uppercase tracking-widest text-blue-400/80 mb-3 font-semibold">End Time</div>
-                                <div id="displayEndTime" class="text-6xl font-mono font-bold text-white drop-shadow-md">
-                                    --:--
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Extra End Time -->
-                        <div class="bg-slate-800/40 backdrop-blur-xl border border-amber-500/20 shadow-xl rounded-xl">
-                            <div class="flex flex-col items-center justify-center p-8">
-                                <div class="text-sm uppercase tracking-widest text-amber-400/80 mb-3 font-semibold">Extra Time End</div>
-                                <div id="displayExtraEndTime" class="text-6xl font-mono font-bold text-white drop-shadow-md">
-                                    --:--
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Controls -->
-                    <div class="col-span-1 lg:col-span-2 flex justify-center mt-4">
-                         <button 
-                            onclick="handleReset()"
-                            class="text-slate-400 hover:text-white hover:bg-white/5 transition-colors p-3 rounded-lg flex items-center justify-center"
-                        >
-                            <span class="w-4 h-4 mr-2">${icons.RotateCcw}</span>
-                            Reset / Configure New Exam
-                        </button>
-                    </div>
-                </div>
             </div>
-
-        </div>
     </div>
+
+    <script>
+        let systemClockInterval;
+
+        // --- Utility Functions ---
+
+        // Function to calculate a time string based on start time and minutes added
+        function calculateTime(start, minutesToAdd) {
+            if (!start || !minutesToAdd) return '--:--';
+            
+            const [hours, minutes] = start.split(':').map(Number);
+            const date = new Date();
+            // Use a fixed date for calculation consistency, but today is fine for HH:MM calculations
+            date.setHours(hours, minutes, 0, 0); 
+            date.setMinutes(date.getMinutes() + Math.round(Number(minutesToAdd)));
+
+            // Format as HH:MM
+            return date.toLocaleTimeString('en-GB', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false 
+            });
+        }
+        
+        // --- Setup Logic ---
+
+        function updateSetupTimes() {
+            const startTime = document.getElementById('start-time-input').value;
+            const duration = document.getElementById('duration-input').value;
+
+            const endTime = calculateTime(startTime, duration);
+            const extraDuration = Math.round(Number(duration) * 1.25);
+            const extraEndTime = calculateTime(startTime, extraDuration);
+
+            document.getElementById('setup-end-time').textContent = endTime;
+            document.getElementById('setup-extra-end-time').textContent = extraEndTime;
+        }
+
+        // --- Runtime Logic (Clock update) ---
+
+        function updateSystemClock() {
+            const now = new Date();
+            // Format: HH:MM:SS
+            const timeString = now.toLocaleTimeString('en-GB', { 
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const displayElement = document.getElementById('current-system-time-display');
+            if (displayElement) {
+                displayElement.textContent = timeString;
+            }
+        }
+        
+        // --- State Controllers ---
+
+        function startExam() {
+            const examName = document.getElementById('exam-name-input').value || 'Exam In Progress';
+            const startTimeValue = document.getElementById('start-time-input').value;
+            const durationValue = document.getElementById('duration-input').value;
+            const centerNumber = document.getElementById('center-number-input').value;
+            const paperCode = document.getElementById('paper-code-input').value;
+            
+            // 1. Calculate and Populate Display Times
+            const endTime = calculateTime(startTimeValue, durationValue);
+            const extraDuration = Math.round(Number(durationValue) * 1.25);
+            const extraEndTime = calculateTime(startTimeValue, extraDuration);
+
+            document.getElementById('start-time-display').textContent = startTimeValue;
+            document.getElementById('end-time-display').textContent = endTime;
+            document.getElementById('extra-end-time-display').textContent = extraEndTime;
+
+            // 2. Update Header Info
+            document.getElementById('header-title').textContent = examName;
+            document.getElementById('header-info').innerHTML = `
+                <div class="flex items-center justify-center gap-8 text-2xl text-blue-100 mt-4 bg-white/5 inline-flex px-8 py-3 rounded-full backdrop-blur-sm border border-white/10 whitespace-nowrap">
+                    ${centerNumber ? `
+                    <div class="flex items-center gap-3">
+                        <span class="uppercase tracking-widest text-xs font-semibold opacity-60">Center No</span>
+                        <span class="font-mono font-bold tracking-wider">${centerNumber}</span>
+                    </div>` : ''}
+                    ${centerNumber && paperCode ? `<div class="w-px bg-white/20 h-8 self-center"></div>` : ''}
+                    ${paperCode ? `
+                    <div class="flex items-center gap-3">
+                        <span class="uppercase tracking-widest text-xs font-semibold opacity-60">Paper Code</span>
+                        <span class="font-mono font-bold tracking-wider">${paperCode}</span>
+                    </div>` : ''}
+                </div>
+            `;
+            
+            // 3. Switch View
+            document.getElementById('setup-state').classList.add('hidden');
+            document.getElementById('running-state').classList.remove('hidden');
+        }
+
+        function resetExam() {
+            document.getElementById('header-title').textContent = 'Exam Timer Setup';
+            document.getElementById('header-info').innerHTML = '<p class="text-blue-200 text-lg">Configure your exam details and schedule</p>';
+            document.getElementById('running-state').classList.add('hidden');
+            document.getElementById('setup-state').classList.remove('hidden');
+        }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Start the system clock immediately and keep it running
+            updateSystemClock();
+            systemClockInterval = setInterval(updateSystemClock, 1000);
+            
+            // Update the calculated times in the setup form on load
+            updateSetupTimes();
+        });
+    </script>
 </body>
 </html>
