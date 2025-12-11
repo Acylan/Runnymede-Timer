@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Static Clock Exam Timer</title>
+    <title>Dynamic Exam Timer - Correct Alignment</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Custom styles to mimic the blue time display glow */
@@ -38,9 +38,9 @@
         
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden z-0">
             <img 
-                src="./assets/Runnymede Logo.png" 
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/768px-Google_%22G%22_logo.svg.png" 
                 alt="Exam Logo" 
-                class="w-[1176px] h-[924px] object-contain opacity-40 blur-sm"
+                class="max-w-[80%] max-h-[80%] object-contain opacity-10 blur-sm"
             />
         </div>
 
@@ -55,10 +55,10 @@
             </div>
 
             <div id="running-state" class="hidden">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-                    <div class="col-span-1 lg:col-span-2 bg-slate-800/40 backdrop-blur-xl border-2 border-blue-400/30 shadow-2xl overflow-hidden rounded-xl">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 opacity-50"></div>
-                        <div class="flex flex-col items-center justify-center p-12 md:p-16">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+                    
+                    <div class="lg:col-span-2 bg-slate-800/40 backdrop-blur-xl border-2 border-blue-400/30 shadow-2xl overflow-hidden rounded-xl">
+                        <div class="flex flex-col items-center justify-center p-12 md:p-16 h-full">
                             <div class="text-lg uppercase tracking-[0.2em] text-blue-300 mb-6 font-semibold flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                 CURRENT TIME
@@ -69,37 +69,37 @@
                         </div>
                     </div>
 
-                    <div class="col-span-1 lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="lg:col-span-1 flex flex-col gap-6">
                         
                         <div class="bg-slate-800/40 backdrop-blur-xl border border-green-500/20 shadow-xl rounded-xl">
-                            <div class="flex flex-col items-center justify-center p-8">
-                                <div class="text-sm uppercase tracking-widest text-green-400/80 mb-3 font-semibold">Start Time</div>
-                                <div id="start-time-display" class="text-6xl font-mono font-bold text-white drop-shadow-md">
+                            <div class="flex flex-col items-center justify-center p-6">
+                                <div class="text-sm uppercase tracking-widest text-green-400/80 mb-2 font-semibold">Start Time</div>
+                                <div id="start-time-display" class="text-5xl font-mono font-bold text-white drop-shadow-md">
                                     09:00
                                 </div>
                             </div>
                         </div>
 
                         <div class="bg-slate-800/40 backdrop-blur-xl border border-blue-500/20 shadow-xl rounded-xl">
-                            <div class="flex flex-col items-center justify-center p-8">
-                                <div class="text-sm uppercase tracking-widest text-blue-400/80 mb-3 font-semibold">End Time</div>
-                                <div id="end-time-display" class="text-6xl font-mono font-bold text-white drop-shadow-md">
+                            <div class="flex flex-col items-center justify-center p-6">
+                                <div class="text-sm uppercase tracking-widest text-blue-400/80 mb-2 font-semibold">End Time</div>
+                                <div id="end-time-display" class="text-5xl font-mono font-bold text-white drop-shadow-md">
                                     11:00
                                 </div>
                             </div>
                         </div>
 
                         <div class="bg-slate-800/40 backdrop-blur-xl border border-amber-500/20 shadow-xl rounded-xl">
-                            <div class="flex flex-col items-center justify-center p-8">
-                                <div class="text-sm uppercase tracking-widest text-amber-400/80 mb-3 font-semibold">Extra Time End</div>
-                                <div id="extra-end-time-display" class="text-6xl font-mono font-bold text-white drop-shadow-md">
+                            <div class="flex flex-col items-center justify-center p-6">
+                                <div class="text-sm uppercase tracking-widest text-amber-400/80 mb-2 font-semibold">Extra Time End</div>
+                                <div id="extra-end-time-display" class="text-5xl font-mono font-bold text-white drop-shadow-md">
                                     11:30
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="col-span-1 lg:col-span-2 flex justify-center mt-4">
+                    <div class="col-span-full flex justify-center mt-2">
                         <button 
                             onclick="resetExam()"
                             class="text-slate-400 hover:text-white hover:bg-white/5 transition-colors p-3 rounded-lg flex items-center"
@@ -210,6 +210,7 @@
 
     <script>
         let systemClockInterval;
+        const appContainer = document.getElementById('app');
 
         // --- Utility Functions ---
 
@@ -219,7 +220,7 @@
             
             const [hours, minutes] = start.split(':').map(Number);
             const date = new Date();
-            // Use a fixed date for calculation consistency, but today is fine for HH:MM calculations
+            // Using a fixed date ensures arithmetic is correct, but only HH:MM is displayed
             date.setHours(hours, minutes, 0, 0); 
             date.setMinutes(date.getMinutes() + Math.round(Number(minutesToAdd)));
 
@@ -236,6 +237,9 @@
         function updateSetupTimes() {
             const startTime = document.getElementById('start-time-input').value;
             const duration = document.getElementById('duration-input').value;
+
+            // Ensure we have valid inputs before calculating
+            if (!startTime || !duration) return;
 
             const endTime = calculateTime(startTime, duration);
             const extraDuration = Math.round(Number(duration) * 1.25);
@@ -264,6 +268,18 @@
         
         // --- State Controllers ---
 
+        function setAlignment(state) {
+            if (state === 'running') {
+                // RUNNING: Align to top, add top padding
+                appContainer.classList.remove('justify-center');
+                appContainer.classList.add('justify-start', 'pt-8');
+            } else {
+                // SETUP: Align to center, remove top padding
+                appContainer.classList.remove('justify-start', 'pt-16');
+                appContainer.classList.add('justify-center');
+            }
+        }
+
         function startExam() {
             const examName = document.getElementById('exam-name-input').value || 'Exam In Progress';
             const startTimeValue = document.getElementById('start-time-input').value;
@@ -283,7 +299,7 @@
             // 2. Update Header Info
             document.getElementById('header-title').textContent = examName;
             document.getElementById('header-info').innerHTML = `
-                <div class="flex items-center justify-center gap-8 text-2xl text-blue-100 mt-4 bg-white/5 inline-flex px-8 py-3 rounded-full backdrop-blur-sm border border-white/10 whitespace-nowrap">
+                <div class="flex items-center justify-center gap-8 text-2xl text-blue-100 bg-white/5 inline-flex px-8 py-3 rounded-full backdrop-blur-sm border border-white/10 whitespace-nowrap">
                     ${centerNumber ? `
                     <div class="flex items-center gap-3">
                         <span class="uppercase tracking-widest text-xs font-semibold opacity-60">Center No</span>
@@ -298,16 +314,21 @@
                 </div>
             `;
             
-            // 3. Switch View
+            // 3. Switch View and Alignment
+            setAlignment('running');
             document.getElementById('setup-state').classList.add('hidden');
             document.getElementById('running-state').classList.remove('hidden');
         }
 
         function resetExam() {
-            document.getElementById('header-title').textContent = 'Exam Timer Setup';
-            document.getElementById('header-info').innerHTML = '<p class="text-blue-200 text-lg">Configure your exam details and schedule</p>';
+            // 1. Switch View and Alignment
+            setAlignment('setup');
             document.getElementById('running-state').classList.add('hidden');
             document.getElementById('setup-state').classList.remove('hidden');
+
+            // 2. Reset Header Info
+            document.getElementById('header-title').textContent = 'Exam Timer Setup';
+            document.getElementById('header-info').innerHTML = '<p class="text-blue-200 text-lg">Configure your exam details and schedule</p>';
         }
 
         // --- Initialization ---
@@ -318,6 +339,9 @@
             
             // Update the calculated times in the setup form on load
             updateSetupTimes();
+
+            // Ensure correct initial alignment (Setup is centered)
+            setAlignment('setup');
         });
     </script>
 </body>
