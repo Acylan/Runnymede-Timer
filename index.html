@@ -1,157 +1,226 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Exam Timer</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Exam Timer - Correct Alignment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .time-shadow-primary { text-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+        input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+        .shadcn-input { display: flex; width: 100%; border-radius: 0.375rem; padding: 0.25rem 0.5rem; font-size: 1rem; line-height: 1.5rem; --tw-ring-offset-width: 0px; --tw-ring-color: transparent; }
+        .shadcn-label { font-size: 0.875rem; font-weight: 500; line-height: 1.25rem; }
+    </style>
 </head>
-<body>
-
-  <div id="app">
-    <img src="./assets/Runnymede Logo.png" alt="" class="background-logo">
-
-    <div class="main-content">
-      <div class="title-area">
-        <h1>Exam Timer</h1>
-        <p>Professional Exam Time Management</p>
-      </div>
-
-      <div id="timer-display-area">
-
-        <div id="setup-message">
-          Set your exam times below and click Ready to Start
-        </div>
-
-        <div id="ready-state" class="hidden">
-          <div class="status-card-ready">
-            <div class="card-label">Status</div>
-            <div class="ready-text">Ready to Start</div>
-            <div id="ready-start-time" class="ready-subtext">
-              Exam will automatically start at 09:00
-            </div>
-            <div id="ready-current-time" class="ready-current-time">
-              Current Time: 00:00:00
-            </div>
-          </div>
-        </div>
-
-        <div id="running-state" class="hidden">
-          <div class="info-bar">
-            <div>
-              <div class="card-label">Current Time</div>
-              <div id="current-time-display" class="info-time">00:00:00</div>
-            </div>
-            <div>
-              <div class="card-label green">Start Time</div>
-              <div id="start-time-display" class="info-time">00:00</div>
-            </div>
-            <div>
-              <div class="card-label">End Time</div>
-              <div id="end-time-display" class="info-time">00:00</div>
-            </div>
-            <div>
-              <div class="card-label amber">Extra End Time</div>
-              <div id="extra-end-time-display" class="info-time">00:00</div>
-            </div>
-          </div>
-
-          <div class="status-card-main">
-            <div id="main-timer-label" class="card-label">Exam Time Remaining</div>
-            <div id="main-time-display" class="main-time-text text-green">
-              00:00:00
-            </div>
-            <div id="main-time-complete-msg" class="time-up-msg amber hidden">
-              Main Time Complete - Extra Time Starting!
-            </div>
-          </div>
-
-          <div id="extra-timer-block" class="status-card-extra">
-            <div id="extra-timer-label" class="card-label amber">Extra Time Available</div>
-            <div id="extra-time-display" class="extra-time-text">
-              00:00:00
-            </div>
-            <div id="extra-time-complete-msg" class="time-up-msg red hidden">
-              ALL TIME UP!
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    <div class="control-panel">
-      <div class="container">
+<body class="bg-slate-900">
+    <div id="app" class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white p-4 flex flex-col items-center justify-center relative overflow-hidden">
         
-        <div id="input-area">
-          <div class="input-grid">
-            <div class="input-group">
-              <label for="starting-time">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                Starting Time
-              </label>
-              <input id="starting-time" type="time" value="09:00">
-            </div>
-            <div class="input-group">
-              <label for="exam-duration">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                Exam Duration (minutes)
-              </label>
-              <input id="exam-duration" type="number" min="1" value="120">
-            </div>
-            <div class="input-group">
-              <label for="extra-time">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Extra Time (minutes)
-              </label>
-              <input id="extra-time" type="number" min="0" value="30">
-            </div>
-          </div>
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden z-0">
+            <img 
+                src="./assets/Runnymede logo.png" 
+                alt="Exam Logo" 
+                class="w-[1176px] h-[824px] object-contain opacity-30 blur-sm"
+            />
         </div>
 
-        <div id="preview-area">
-          <div class="preview-grid">
-            <div class="preview-card" id="preview-start-card">
-              <div class="preview-label">Start Time:</div>
-              <div id="preview-start" class="preview-time">09:00</div>
+        <div class="relative z-10 w-full max-w-7xl space-y-8">
+            <div class="text-center space-y-4">
+                <h1 id="header-title" class="text-5xl md:text-7xl font-bold tracking-tight text-white drop-shadow-lg">
+                    Exam Timer Setup
+                </h1>
+                <div id="header-info">
+                    <p class="text-blue-200 text-lg">Configure your exam details and schedule</p>
+                </div>
             </div>
-            <div class="preview-card" id="preview-duration-card">
-              <div class="preview-label">Exam Duration:</div>
-              <div id="preview-duration" class="preview-time">02:00:00</div>
+
+            <div id="running-state" class="hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+                    
+                    <div class="lg:col-span-2 bg-slate-800/40 backdrop-blur-xl border-2 border-blue-400/30 shadow-2xl overflow-hidden rounded-xl">
+                        <div class="flex flex-col items-center justify-center p-12 md:p-16 h-full">
+                            <div class="text-lg uppercase tracking-[0.2em] text-blue-300 mb-6 font-semibold flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                CURRENT TIME
+                            </div>
+                            <div id="current-system-time-display" class="text-8xl md:text-[10rem] leading-none font-mono font-bold text-white tracking-wider time-shadow-primary">
+                                00:00:00
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-1 flex flex-col gap-6">
+                        <div class="bg-slate-800/40 backdrop-blur-xl border border-green-500/20 shadow-xl rounded-xl opacity-70">
+                            <div class="flex flex-col items-center justify-center p-6">
+                                <div class="text-xs uppercase tracking-widest text-green-400/80 mb-2 font-semibold">Start Time</div>
+                                <div id="start-time-display" class="text-5xl font-mono font-bold text-white drop-shadow-md">
+                                    09:00
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800/40 backdrop-blur-xl border border-blue-500/20 shadow-xl rounded-xl">
+                            <div class="flex flex-col items-center justify-center p-8">
+                                <div class="text-sm uppercase tracking-widest text-blue-400/80 mb-2 font-semibold">End Time</div>
+                                <div id="end-time-display" class="text-8xl font-mono font-bold text-white drop-shadow-md">
+                                    11:00
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800/40 backdrop-blur-xl border border-amber-500/20 shadow-xl rounded-xl">
+                            <div class="flex flex-col items-center justify-center p-6">
+                                <div class="text-xs uppercase tracking-widest text-amber-400/80 mb-2 font-semibold">Extra Time End</div>
+                                <div id="extra-end-time-display" class="text-5xl font-mono font-bold italic text-white drop-shadow-md">
+                                    11:30
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-span-full flex justify-center mt-2">
+                        <button onclick="resetExam()" class="text-slate-400 hover:text-white hover:bg-white/5 transition-colors p-3 rounded-lg flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6"/><path d="M21.1 17.5a9 9 0 1 1-2.2-8.5"/><path d="M21.5 2l-4 4"/></svg>
+                            Reset / Configure New Exam
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="preview-card" id="preview-extra-card">
-              <div class="preview-label">Extra Time:</div>
-              <div id="preview-extra" class="preview-time">00:30:00</div>
+
+            <div id="setup-state" class="">
+                <div class="bg-slate-800/60 backdrop-blur-xl border border-slate-700 shadow-2xl max-w-4xl mx-auto rounded-xl">
+                    <div class="p-8 md:p-10 space-y-8">
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                            <div class="md:col-span-8 space-y-2">
+                                <label class="shadcn-label text-blue-200">Exam Name / Subject</label>
+                                <div class="relative">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-3.5 h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20h-5.5"/><path d="M18 6h-8"/><path d="M18 10h-8"/><path d="M12 14h-2"/></svg>
+                                    <input type="text" id="exam-name-input" value="A-Level Maths" class="shadcn-input pl-9 bg-slate-900/50 border-slate-600 text-white h-11 text-lg focus:border-blue-500 transition-colors" />
+                                </div>
+                            </div>
+                            <div class="md:col-span-4 space-y-2">
+                                <label class="shadcn-label text-green-300">Starting Time</label>
+                                <div class="relative">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-3.5 h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                    <input type="time" id="start-time-input" value="09:00" oninput="updateSetupTimes()" class="shadcn-input pl-9 bg-slate-900/50 border-green-500/30 text-white h-11 font-mono text-lg" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="space-y-2">
+                                <label class="shadcn-label text-blue-200">Center Number</label>
+                                <input type="text" id="center-number-input" value="12345" class="shadcn-input bg-slate-900/50 border-slate-600 text-white h-11" />
+                            </div>
+                            <div class="space-y-2">
+                                <label class="shadcn-label text-blue-200">Paper / Unit Code</label>
+                                <input type="text" id="paper-code-input" value="9709/12" class="shadcn-input bg-slate-900/50 border-slate-600 text-white h-11" />
+                            </div>
+                            <div class="space-y-2">
+                                <label class="shadcn-label text-blue-300">Duration (Minutes)</label>
+                                <div class="flex items-center gap-3 bg-slate-900/50 border border-blue-500/30 rounded-md p-1 pr-3 h-11">
+                                    <input type="number" id="duration-input" value="120" oninput="updateSetupTimes()" class="bg-transparent border-0 text-white h-full w-20 text-center font-mono focus-visible:ring-0 text-lg shadcn-input" />
+                                    <div class="h-6 w-px bg-slate-700 mx-1"></div>
+                                    <div class="flex flex-col text-xs leading-tight whitespace-nowrap">
+                                        <span class="text-blue-200">End: <span id="setup-end-time" class="font-mono font-bold text-white">11:00</span></span>
+                                        <span class="text-amber-200">Extra: <span id="setup-extra-end-time" class="font-mono font-bold text-white">11:30</span></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-4">
+                            <button onclick="startExam()" type="button" class="w-full h-14 text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg rounded-lg flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-2 fill-current" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                START EXAM DISPLAY
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-
-        <div id="button-area" class="button-row">
-          <button id="btn-ready-start" class="btn btn-green">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            Ready to Start
-          </button>
-          
-          <button id="btn-pause" class="btn btn-outline-blue hidden">
-            <svg id="icon-pause" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-            <svg id="icon-play" class="hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            <span id="btn-pause-text">Pause</span>
-          </button>
-
-          <button id="btn-reset" class="btn btn-outline-red hidden">
-            <span id="btn-reset-text">Reset</span>
-          </button>
-        </div>
-
-        <div id="status-indicator" class="status-indicator-row hidden">
-          <div id="status-dot" class="status-dot"></div>
-          <span id="status-text">Timer Running</span>
-        </div>
-
-      </div>
     </div>
-  </div>
 
-  <script src="script.js"></script>
+    <script>
+        const appContainer = document.getElementById('app');
+
+        function calculateTime(start, minutesToAdd) {
+            if (!start || !minutesToAdd) return '--:--';
+            const [hours, minutes] = start.split(':').map(Number);
+            const date = new Date();
+            date.setHours(hours, minutes, 0, 0); 
+            date.setMinutes(date.getMinutes() + Math.round(Number(minutesToAdd)));
+            return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+        }
+
+        function updateSetupTimes() {
+            const startTime = document.getElementById('start-time-input').value;
+            const duration = document.getElementById('duration-input').value;
+            if (!startTime || !duration) return;
+            document.getElementById('setup-end-time').textContent = calculateTime(startTime, duration);
+            document.getElementById('setup-extra-end-time').textContent = calculateTime(startTime, Math.round(Number(duration) * 1.25));
+        }
+
+        function updateSystemClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-GB', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('current-system-time-display').textContent = timeString;
+        }
+
+        function setAlignment(state) {
+            if (state === 'running') {
+                appContainer.classList.remove('justify-center');
+                appContainer.classList.add('justify-start', 'pt-8');
+            } else {
+                appContainer.classList.remove('justify-start', 'pt-8');
+                appContainer.classList.add('justify-center');
+            }
+        }
+
+        function startExam() {
+            const examName = document.getElementById('exam-name-input').value || 'Exam In Progress';
+            const startTimeValue = document.getElementById('start-time-input').value;
+            const durationValue = document.getElementById('duration-input').value;
+            const centerNumber = document.getElementById('center-number-input').value;
+            const paperCode = document.getElementById('paper-code-input').value;
+            
+            document.getElementById('start-time-display').textContent = startTimeValue;
+            document.getElementById('end-time-display').textContent = calculateTime(startTimeValue, durationValue);
+            document.getElementById('extra-end-time-display').textContent = calculateTime(startTimeValue, Math.round(Number(durationValue) * 1.25));
+
+            document.getElementById('header-title').textContent = examName;
+            document.getElementById('header-info').innerHTML = `
+                <div class="flex items-center justify-center gap-10 text-3xl text-blue-100 bg-white/5 inline-flex px-10 py-4 rounded-full backdrop-blur-sm border border-white/10 whitespace-nowrap">
+                    ${centerNumber ? `<div class="flex items-center gap-4">
+                        <span class="uppercase tracking-widest text-[10px] font-semibold opacity-60">Center No</span>
+                        <span class="font-mono font-bold tracking-wider">${centerNumber}</span>
+                    </div>` : ''}
+                    ${centerNumber && paperCode ? `<div class="w-px bg-white/20 h-10 self-center"></div>` : ''}
+                    ${paperCode ? `<div class="flex items-center gap-4">
+                        <span class="uppercase tracking-widest text-[10px] font-semibold opacity-60">Paper Code</span>
+                        <span class="font-mono font-bold tracking-wider">${paperCode}</span>
+                    </div>` : ''}
+                </div>
+            `;
+            
+            setAlignment('running');
+            document.getElementById('setup-state').classList.add('hidden');
+            document.getElementById('running-state').classList.remove('hidden');
+        }
+
+        function resetExam() {
+            setAlignment('setup');
+            document.getElementById('running-state').classList.add('hidden');
+            document.getElementById('setup-state').classList.remove('hidden');
+            document.getElementById('header-title').textContent = 'Exam Timer Setup';
+            document.getElementById('header-info').innerHTML = '<p class="text-blue-200 text-lg">Configure your exam details and schedule</p>';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateSystemClock();
+            setInterval(updateSystemClock, 1000);
+            updateSetupTimes();
+            setAlignment('setup');
+        });
+    </script>
 </body>
 </html>
