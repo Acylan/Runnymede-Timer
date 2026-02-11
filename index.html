@@ -91,11 +91,11 @@
 
                 <!-- Dual-exam layout -->
                 <div id="dual-exam-view" class="hidden max-w-[95vw] mx-auto space-y-4">
-                    <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.9fr)_minmax(0,0.8fr)] gap-4 items-stretch">
+                    <div class="grid grid-cols-1 xl:grid-cols-[0.8fr_1.9fr_0.8fr] gap-4 items-stretch min-h-[650px]">
                         <!-- Left exam -->
-                        <div class="flex flex-col justify-between p-4 md:p-6 space-y-6">
+                        <div class="flex flex-col h-full p-4 md:p-6 gap-6">
                             <div class="space-y-3 text-center">
-                                <h2 id="dual-exam1-title" class="text-3xl font-semibold tracking-tight text-white">
+                                <h2 id="dual-exam1-title" class="text-5xl font-semibold tracking-tight text-white">
                                     Exam 1
                                 </h2>
                                 <div class="inline-flex items-start justify-center gap-6 bg-white/5 rounded-full border border-white/10 px-6 py-3 text-sm text-blue-50 w-full max-w-md mx-auto">
@@ -111,22 +111,22 @@
                                 </div>
                             </div>
 
-                            <div class="grid grid-rows-3 gap-3 pt-1">
-                                <div class="bg-slate-800/40 backdrop-blur-xl border border-green-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-3 px-5">
+                            <div class="flex flex-col flex-1 gap-4">
+                                <div class="bg-slate-800/40 backdrop-blur-xl border border-green-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-2 px-5">
                                     <div class="text-xs uppercase tracking-[0.18em] text-green-400/80 mb-2 font-semibold">Start Time</div>
-                                    <div id="dual-exam1-start-time-display" class="text-3xl md:text-4xl font-mono font-bold text-white/80 drop-shadow-md">
+                                    <div id="dual-exam1-start-time-display" class="text-5xl md:text-6xl font-mono font-bold text-white/80 drop-shadow-md">
                                         09:00
                                     </div>
                                 </div>
                                 <div class="bg-slate-800/40 backdrop-blur-xl border border-blue-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-8 px-7">
                                     <div class="text-sm uppercase tracking-[0.18em] text-blue-400/80 mb-2 font-semibold">End Time</div>
-                                    <div id="dual-exam1-end-time-display" class="text-5xl md:text-6xl font-mono font-bold text-white drop-shadow-md">
+                                    <div id="dual-exam1-end-time-display" class="text-7xl md:text-8xl font-mono font-bold text-white drop-shadow-md">
                                         10:30
                                     </div>
                                 </div>
-                                <div class="bg-slate-800/40 backdrop-blur-xl border border-amber-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-3 px-5">
+                                <div class="bg-slate-800/40 backdrop-blur-xl border border-amber-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-2 px-5">
                                     <div class="text-xs uppercase tracking-[0.18em] text-amber-400/80 mb-2 font-semibold">Extra Time End</div>
-                                    <div id="dual-exam1-extra-end-time-display" class="text-2xl md:text-3xl font-mono font-bold italic text-white/80 drop-shadow-md">
+                                    <div id="dual-exam1-extra-end-time-display" class="text-4xl md:text-5xl font-mono font-bold italic text-white/80 drop-shadow-md">
                                         10:53
                                     </div>
                                 </div>
@@ -134,7 +134,7 @@
                         </div>
 
                         <!-- Center current-time column -->
-                        <div class="bg-slate-800/40 backdrop-blur-xl border-2 border-blue-400/30 shadow-2xl rounded-2xl flex flex-col items-center justify-center px-10 py-12">
+                        <div class="bg-slate-800/40 backdrop-blur-xl border-2 border-blue-400/30 shadow-2xl rounded-2xl flex flex-col items-center justify-center px-8 py-8 h-[600px]">
                             <div class="text-lg uppercase tracking-[0.2em] text-blue-300 mb-6 font-semibold flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                 CURRENT TIME
@@ -145,9 +145,9 @@
                         </div>
 
                         <!-- Right exam -->
-                        <div class="flex flex-col justify-between p-4 md:p-6 space-y-6">
+                        <div class="flex flex-col h-full p-4 md:p-6 gap-6">
                             <div class="space-y-3 text-center">
-                                <h2 id="dual-exam2-title" class="text-3xl font-semibold tracking-tight text-white">
+                                <h2 id="dual-exam2-title" class="text-5xl font-semibold tracking-tight text-white">
                                     Exam 2
                                 </h2>
                                 <div class="inline-flex items-start justify-center gap-6 bg-white/5 rounded-full border border-white/10 px-6 py-3 text-sm text-blue-50 w-full max-w-md mx-auto">
@@ -163,22 +163,22 @@
                                 </div>
                             </div>
 
-                            <div class="grid grid-rows-3 gap-3 pt-1">
-                                <div class="bg-slate-800/40 backdrop-blur-xl border border-green-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-3 px-5">
+                            <div class="flex flex-col flex-1 gap-4">
+                                <div class="bg-slate-800/40 backdrop-blur-xl border border-green-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-2 px-5">
                                     <div class="text-xs uppercase tracking-[0.18em] text-green-400/80 mb-2 font-semibold">Start Time</div>
-                                    <div id="dual-exam2-start-time-display" class="text-3xl md:text-4xl font-mono font-bold text-white/80 drop-shadow-md">
+                                    <div id="dual-exam2-start-time-display" class="text-5xl md:text-6xl font-mono font-bold text-white/80 drop-shadow-md">
                                         09:00
                                     </div>
                                 </div>
                                 <div class="bg-slate-800/40 backdrop-blur-xl border border-blue-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-8 px-7">
                                     <div class="text-sm uppercase tracking-[0.18em] text-blue-400/80 mb-2 font-semibold">End Time</div>
-                                    <div id="dual-exam2-end-time-display" class="text-5xl md:text-6xl font-mono font-bold text-white drop-shadow-md">
+                                    <div id="dual-exam2-end-time-display" class="text-7xl md:text-8xl font-mono font-bold text-white drop-shadow-md">
                                         10:30
                                     </div>
                                 </div>
-                                <div class="bg-slate-800/40 backdrop-blur-xl border border-amber-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-3 px-5">
+                                <div class="bg-slate-800/40 backdrop-blur-xl border border-amber-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-2 px-5">
                                     <div class="text-xs uppercase tracking-[0.18em] text-amber-400/80 mb-2 font-semibold">Extra Time End</div>
-                                    <div id="dual-exam2-extra-end-time-display" class="text-2xl md:text-3xl font-mono font-bold italic text-white/80 drop-shadow-md">
+                                    <div id="dual-exam2-extra-end-time-display" class="text-4xl md:text-5xl font-mono font-bold italic text-white/80 drop-shadow-md">
                                         10:53
                                     </div>
                                 </div>
@@ -199,12 +199,12 @@
             <div id="setup-state" class="">
                 <div class="max-w-4xl mx-auto space-y-4">
                     <!-- Exam toggle bar (shown when 2 exams are selected) -->
-                    <div id="exam-toggle-bar" class="hidden flex justify-center">
-                        <div class="inline-flex bg-slate-900/70 border border-blue-500/40 rounded-full p-1 text-sm">
-                            <button id="exam-tab-1" type="button" class="px-4 py-1.5 rounded-full bg-blue-600 text-white font-semibold">
+                    <div id="exam-toggle-bar" class="hidden w-full">
+                        <div class="w-full flex bg-slate-900/70 border border-blue-500/40 rounded-xl p-1 text-sm">
+                            <button id="exam-tab-1" type="button" class="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:text-white hover:bg-blue-500/40">
                                 Exam 1
                             </button>
-                            <button id="exam-tab-2" type="button" class="px-4 py-1.5 rounded-full text-blue-200 hover:text-white hover:bg-blue-500/40 font-semibold">
+                            <button id="exam-tab-2" type="button" class="flex-1 px-4 py-2 rounded-lg text-blue-200 hover:text-white hover:bg-blue-500/40 font-semibold">
                                 Exam 2
                             </button>
                         </div>
@@ -218,7 +218,7 @@
                                     <label class="shadcn-label text-blue-200">Exam Name / Subject</label>
                                     <div class="relative">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-3.5 h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20h-5.5"/><path d="M18 6h-8"/><path d="M18 10h-8"/><path d="M12 14h-2"/></svg>
-                                        <input type="text" id="exam-name-input" value="A-Level Maths" class="shadcn-input pl-14 bg-slate-900/50 border-slate-600 text-white h-11 text-lg focus:border-blue-500 transition-colors" />
+                                        <input type="text" id="exam-name-input" value="A-Level Maths" class="shadcn-input pl-10 bg-slate-900/50 border-slate-600 text-white h-11 text-lg focus:border-blue-500 transition-colors" />
                                     </div>
                                 </div>
 
@@ -240,7 +240,7 @@
                                     <label class="shadcn-label text-green-300">Starting Time</label>
                                     <div class="relative">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-3.5 h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                        <input type="time" id="start-time-input" value="09:00" oninput="updateSetupTimes()" class="shadcn-input pl-14 bg-slate-900/50 border-green-500/30 text-white h-11 font-mono text-lg" />
+                                        <input type="time" id="start-time-input" value="09:00" oninput="updateSetupTimes()" class="shadcn-input pl-10 bg-slate-900/50 border-green-500/30 text-white h-11 font-mono text-lg" />
                                     </div>
                                 </div>
                             </div>
@@ -419,6 +419,11 @@
             const headerInfoEl = document.getElementById('header-info');
 
             if (examCount === 2) {
+                document.getElementById('dual-current-system-time-display')
+                    .classList.remove('text-7xl', 'md:text-[5.5rem]', 'lg:text-[6.5rem]', 'xl:text-[7rem]');
+
+                document.getElementById('dual-current-system-time-display')
+                    .classList.add('text-[6rem]', 'md:text-[8rem]', 'lg:text-[9rem]');
                 if (!exam2.duration || exam2.duration <= 0) {
                     alert('Please enter a valid duration for Exam 2 (toggle to Exam 2 in the bar above the card).');
                     return;
@@ -514,7 +519,12 @@
             examConfigs[1].paper = document.getElementById('paper-code-input').value || '';
             examConfigs[1].duration = Number(document.getElementById('duration-input').value || 0);
             // Default Exam 2 duration same as Exam 1 (can be changed)
-            examConfigs[2].duration = examConfigs[1].duration;
+            examConfigs[2] = {
+                name: 'A-Level Physics',
+                center: examConfigs[1].center || '',
+                paper: '9702/22',
+                duration: 90
+            };
 
             updateSystemClock();
             setInterval(updateSystemClock, 1000);
@@ -542,475 +552,6 @@
                     });
                 }
             });
-        });
-    </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Exam Timer - Correct Alignment</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .time-shadow-primary { text-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
-        input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(1); }
-        .shadcn-input { display: flex; width: 100%; border-radius: 0.375rem; padding: 0.25rem 0.5rem; font-size: 1rem; line-height: 1.5rem; --tw-ring-offset-width: 0px; --tw-ring-color: transparent; }
-        .shadcn-label { font-size: 0.875rem; font-weight: 500; line-height: 1.25rem; }
-    </style>
-</head>
-<body class="bg-slate-900">
-    <div id="app" class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white p-4 flex flex-col items-center justify-center relative overflow-hidden">
-        
-        <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden z-0">
-            <img 
-                src="./assets/Runnymede logo.png" 
-                alt="Exam Logo" 
-                class="w-[1176px] h-[824px] object-contain opacity-30 blur-sm"
-            />
-        </div>
-
-        <div class="relative z-10 w-full max-w-7xl space-y-8">
-            <div class="text-center space-y-4">
-                <h1 id="header-title" class="text-5xl md:text-7xl font-bold tracking-tight text-white drop-shadow-lg">
-                    Exam Timer Setup
-                </h1>
-                <div id="header-info">
-                    <p class="text-blue-200 text-lg">Configure your exam details and schedule</p>
-                </div>
-            </div>
-
-            <div id="running-state" class="hidden">
-                <!-- Single-exam layout (matches third mockup) -->
-                <div id="single-exam-view" class="grid grid-cols-1 min-[1256px]:grid-cols-3 gap-6 max-w-7xl mx-auto">
-                    
-                    <div class="lg:col-span-2 bg-slate-800/40 backdrop-blur-xl border-2 border-blue-400/30 shadow-2xl overflow-hidden rounded-xl">
-                        <div class="flex flex-col items-center justify-center p-12 md:p-16 h-full">
-                            <div class="text-lg uppercase tracking-[0.2em] text-blue-300 mb-6 font-semibold flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                CURRENT TIME
-                            </div>
-                            <div id="current-system-time-display" class="text-8xl md:text-[10rem] leading-none font-mono font-bold text-white tracking-wider time-shadow-primary">
-                                00:00:00
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="lg:col-span-1 flex flex-col gap-6">
-                        <div class="bg-slate-800/40 backdrop-blur-xl border border-green-500/20 shadow-xl rounded-xl opacity-70">
-                            <div class="flex flex-col items-center justify-center p-6">
-                                <div class="text-xs uppercase tracking-widest text-green-400/80 mb-2 font-semibold">Start Time</div>
-                                <div id="start-time-display" class="text-5xl font-mono font-bold text-white drop-shadow-md">
-                                    09:00
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-slate-800/40 backdrop-blur-xl border border-blue-500/20 shadow-xl rounded-xl">
-                            <div class="flex flex-col items-center justify-center p-8">
-                                <div class="text-sm uppercase tracking-widest text-blue-400/80 mb-2 font-semibold">End Time</div>
-                                <div id="end-time-display" class="text-8xl font-mono font-bold text-white drop-shadow-md">
-                                    11:00
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-slate-800/40 backdrop-blur-xl border border-amber-500/20 shadow-xl rounded-xl">
-                            <div class="flex flex-col items-center justify-center p-6">
-                                <div class="text-xs uppercase tracking-widest text-amber-400/80 mb-2 font-semibold">Extra Time End</div>
-                                <div id="extra-end-time-display" class="text-5xl font-mono font-bold italic text-white drop-shadow-md">
-                                    11:30
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-span-full flex justify-center mt-2">
-                        <button onclick="resetExam()" class="text-slate-400 hover:text-white hover:bg-white/5 transition-colors p-3 rounded-lg flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6"/><path d="M21.1 17.5a9 9 0 1 1-2.2-8.5"/><path d="M21.5 2l-4 4"/></svg>
-                            Reset / Configure New Exam
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Dual-exam layout (matches second mockup) -->
-                <div id="dual-exam-view" class="hidden max-w-7xl mx-auto space-y-6">
-                    <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,1.1fr)_minmax(0,1.15fr)] gap-6 items-stretch">
-                        <!-- Left exam column -->
-                        <div class="bg-slate-800/40 backdrop-blur-xl border border-slate-700/70 shadow-2xl rounded-2xl flex flex-col justify-between p-8 space-y-6">
-                            <div class="space-y-4">
-                                <h2 id="dual-exam1-title" class="text-3xl font-semibold tracking-tight text-white">
-                                    Exam 1
-                                </h2>
-                                <div class="inline-flex items-start gap-6 bg-white/5 rounded-full border border-white/10 px-6 py-3 text-sm text-blue-50 w-full max-w-md">
-                                    <div class="flex flex-col">
-                                        <span class="uppercase tracking-[0.18em] text-[10px] font-semibold opacity-70">Center No</span>
-                                        <span id="dual-exam1-center" class="text-lg font-mono font-bold tracking-wider">12345</span>
-                                    </div>
-                                    <div class="h-9 w-px bg-white/20 self-stretch"></div>
-                                    <div class="flex flex-col">
-                                        <span class="uppercase tracking-[0.18em] text-[10px] font-semibold opacity-70">Paper Code</span>
-                                        <span id="dual-exam1-paper" class="text-lg font-mono font-bold tracking-wider">9709/12</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-rows-3 gap-4 pt-2">
-                                <div class="bg-slate-900/60 border border-green-500/30 rounded-xl flex flex-col items-center justify-center py-4">
-                                    <div class="text-xs uppercase tracking-[0.18em] text-green-400/80 mb-2 font-semibold">Start Time</div>
-                                    <div id="dual-exam1-start-time-display" class="text-4xl md:text-5xl font-mono font-bold text-white drop-shadow-md">
-                                        09:00
-                                    </div>
-                                </div>
-                                <div class="bg-slate-900/60 border border-blue-500/30 rounded-xl flex flex-col items-center justify-center py-4">
-                                    <div class="text-xs uppercase tracking-[0.18em] text-blue-400/80 mb-2 font-semibold">End Time</div>
-                                    <div id="dual-exam1-end-time-display" class="text-5xl md:text-6xl font-mono font-bold text-white drop-shadow-md">
-                                        10:30
-                                    </div>
-                                </div>
-                                <div class="bg-slate-900/60 border border-amber-500/40 rounded-xl flex flex-col items-center justify-center py-4">
-                                    <div class="text-xs uppercase tracking-[0.18em] text-amber-400/80 mb-2 font-semibold">Extra Time End</div>
-                                    <div id="dual-exam1-extra-end-time-display" class="text-3xl md:text-4xl font-mono font-bold italic text-white drop-shadow-md">
-                                        10:53
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Center current-time column -->
-                        <div class="bg-slate-800/40 backdrop-blur-xl border-2 border-blue-400/30 shadow-2xl rounded-2xl flex flex-col items-center justify-center px-10 py-12">
-                            <div class="text-lg uppercase tracking-[0.2em] text-blue-300 mb-6 font-semibold flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                CURRENT TIME
-                            </div>
-                            <div id="dual-current-system-time-display" class="text-7xl md:text-[5.5rem] lg:text-[6.5rem] xl:text-[7rem] leading-none font-mono font-bold text-white tracking-wider time-shadow-primary">
-                                00:00:00
-                            </div>
-                        </div>
-
-                        <!-- Right exam column -->
-                        <div class="bg-slate-800/40 backdrop-blur-xl border border-slate-700/70 shadow-2xl rounded-2xl flex flex-col justify-between p-8 space-y-6">
-                            <div class="space-y-4 items-end text-right">
-                                <h2 id="dual-exam2-title" class="text-3xl font-semibold tracking-tight text-white">
-                                    Exam 2
-                                </h2>
-                                <div class="ml-auto inline-flex items-start gap-6 bg-white/5 rounded-full border border-white/10 px-6 py-3 text-sm text-blue-50 w-full max-w-md justify-end">
-                                    <div class="flex flex-col text-right">
-                                        <span class="uppercase tracking-[0.18em] text-[10px] font-semibold opacity-70">Center No</span>
-                                        <span id="dual-exam2-center" class="text-lg font-mono font-bold tracking-wider">12345</span>
-                                    </div>
-                                    <div class="h-9 w-px bg-white/20 self-stretch"></div>
-                                    <div class="flex flex-col text-right">
-                                        <span class="uppercase tracking-[0.18em] text-[10px] font-semibold opacity-70">Paper Code</span>
-                                        <span id="dual-exam2-paper" class="text-lg font-mono font-bold tracking-wider">9702/22</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-rows-3 gap-4 pt-2">
-                                <div class="bg-slate-900/60 border border-green-500/30 rounded-xl flex flex-col items-center justify-center py-4">
-                                    <div class="text-xs uppercase tracking-[0.18em] text-green-400/80 mb-2 font-semibold">Start Time</div>
-                                    <div id="dual-exam2-start-time-display" class="text-4xl md:text-5xl font-mono font-bold text-white drop-shadow-md">
-                                        09:00
-                                    </div>
-                                </div>
-                                <div class="bg-slate-900/60 border border-blue-500/30 rounded-xl flex flex-col items-center justify-center py-4">
-                                    <div class="text-xs uppercase tracking-[0.18em] text-blue-400/80 mb-2 font-semibold">End Time</div>
-                                    <div id="dual-exam2-end-time-display" class="text-5xl md:text-6xl font-mono font-bold text-white drop-shadow-md">
-                                        10:30
-                                    </div>
-                                </div>
-                                <div class="bg-slate-900/60 border border-amber-500/40 rounded-xl flex flex-col items-center justify-center py-4">
-                                    <div class="text-xs uppercase tracking-[0.18em] text-amber-400/80 mb-2 font-semibold">Extra Time End</div>
-                                    <div id="dual-exam2-extra-end-time-display" class="text-3xl md:text-4xl font-mono font-bold italic text-white drop-shadow-md">
-                                        10:53
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-center">
-                        <button onclick="resetExam()" class="text-slate-400 hover:text-white hover:bg-white/5 transition-colors p-3 rounded-lg flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6"/><path d="M21.1 17.5a9 9 0 1 1-2.2-8.5"/><path d="M21.5 2l-4 4"/></svg>
-                            Reset / Configure New Exam
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="setup-state" class="">
-                <div class="bg-slate-800/60 backdrop-blur-xl border border-slate-700 shadow-2xl max-w-4xl mx-auto rounded-xl">
-                    <div class="p-8 md:p-10 space-y-8">
-                        <div class="flex flex-wrap items-center justify-between gap-3">
-                            <span class="shadcn-label text-blue-100">Number of Exams</span>
-                            <div class="flex items-center gap-4 text-sm text-slate-200">
-                                <label class="inline-flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" name="exam-count" value="1" class="accent-blue-500" checked />
-                                    <span>1 Exam</span>
-                                </label>
-                                <label class="inline-flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" name="exam-count" value="2" class="accent-blue-500" />
-                                    <span>2 Exams</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-                            <div class="md:col-span-8 space-y-2">
-                                <label class="shadcn-label text-blue-200">Exam Name / Subject</label>
-                                <div class="relative">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-3.5 h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20h-5.5"/><path d="M18 6h-8"/><path d="M18 10h-8"/><path d="M12 14h-2"/></svg>
-                                    <input type="text" id="exam-name-input" value="A-Level Maths" class="shadcn-input pl-9 bg-slate-900/50 border-slate-600 text-white h-11 text-lg focus:border-blue-500 transition-colors" />
-                                </div>
-                            </div>
-                            <div class="md:col-span-4 space-y-2">
-                                <label class="shadcn-label text-green-300">Starting Time</label>
-                                <div class="relative">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-3.5 h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                    <input type="time" id="start-time-input" value="09:00" oninput="updateSetupTimes()" class="shadcn-input pl-9 bg-slate-900/50 border-green-500/30 text-white h-11 font-mono text-lg" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="space-y-2">
-                                <label class="shadcn-label text-blue-200">Center Number</label>
-                                <input type="text" id="center-number-input" value="12345" class="shadcn-input bg-slate-900/50 border-slate-600 text-white h-11" />
-                            </div>
-                            <div class="space-y-2">
-                                <label class="shadcn-label text-blue-200">Paper / Unit Code</label>
-                                <input type="text" id="paper-code-input" value="9709/12" class="shadcn-input bg-slate-900/50 border-slate-600 text-white h-11" />
-                            </div>
-                            <div class="space-y-2">
-                                <label class="shadcn-label text-blue-300">Duration (Minutes)</label>
-                                <div class="flex items-center gap-3 bg-slate-900/50 border border-blue-500/30 rounded-md p-1 pr-3 h-11">
-                                    <input type="number" id="duration-input" value="120" oninput="updateSetupTimes()" class="bg-transparent border-0 text-white h-full w-20 text-center font-mono focus-visible:ring-0 text-lg shadcn-input" />
-                                    <div class="h-6 w-px bg-slate-700 mx-1"></div>
-                                    <div class="flex flex-col text-xs leading-tight whitespace-nowrap">
-                                        <span class="text-blue-200">End: <span id="setup-end-time" class="font-mono font-bold text-white">11:00</span></span>
-                                        <span class="text-amber-200">Extra: <span id="setup-extra-end-time" class="font-mono font-bold text-white">11:30</span></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Optional second exam configuration to enable dual-timer view -->
-                        <div class="pt-6 mt-2 border-t border-slate-700/60 space-y-6">
-                            <div class="flex items-center justify-between">
-                                <p class="text-sm font-semibold text-slate-100">Optional Second Exam</p>
-                                <p class="text-xs text-slate-400">Select "2 Exams" above and complete this section to show two exams side by side.</p>
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-                                <div class="md:col-span-8 space-y-2">
-                                    <label class="shadcn-label text-blue-200">Second Exam Name / Subject</label>
-                                    <div class="relative">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-3.5 h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20h-5.5"/><path d="M18 6h-8"/><path d="M18 10h-8"/><path d="M12 14h-2"/></svg>
-                                        <input type="text" id="exam2-name-input" placeholder="e.g. A-Level Physics" class="shadcn-input pl-9 bg-slate-900/40 border-slate-700 text-white h-11 text-lg focus:border-blue-500 transition-colors" />
-                                    </div>
-                                </div>
-                                <div class="md:col-span-4 space-y-2">
-                                    <label class="shadcn-label text-green-300">Starting Time</label>
-                                    <p class="text-sm text-slate-300">
-                                        Uses the same starting time as the first exam above.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div class="space-y-2">
-                                    <label class="shadcn-label text-blue-200">Second Center Number</label>
-                                    <input type="text" id="center-number2-input" class="shadcn-input bg-slate-900/40 border-slate-700 text-white h-11" />
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="shadcn-label text-blue-200">Second Paper / Unit Code</label>
-                                    <input type="text" id="paper-code2-input" class="shadcn-input bg-slate-900/40 border-slate-700 text-white h-11" />
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="shadcn-label text-blue-300">Second Duration (Minutes)</label>
-                                    <div class="flex items-center gap-3 bg-slate-900/40 border border-blue-500/30 rounded-md p-1 pr-3 h-11">
-                                        <input type="number" id="duration2-input" min="0" oninput="updateSetupTimes()" class="bg-transparent border-0 text-white h-full w-20 text-center font-mono focus-visible:ring-0 text-lg shadcn-input" />
-                                        <div class="h-6 w-px bg-slate-700 mx-1"></div>
-                                        <div class="flex flex-col text-xs leading-tight whitespace-nowrap">
-                                            <span class="text-blue-200">End: <span id="setup2-end-time" class="font-mono font-bold text-white">--:--</span></span>
-                                            <span class="text-amber-200">Extra: <span id="setup2-extra-end-time" class="font-mono font-bold text-white">--:--</span></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="pt-4">
-                            <button onclick="startExam()" type="button" class="w-full h-14 text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg rounded-lg flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-2 fill-current" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                                START EXAM DISPLAY
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const appContainer = document.getElementById('app');
-
-        function calculateTime(start, minutesToAdd) {
-            if (!start || !minutesToAdd) return '--:--';
-            const [hours, minutes] = start.split(':').map(Number);
-            const date = new Date();
-            date.setHours(hours, minutes, 0, 0); 
-            date.setMinutes(date.getMinutes() + Math.round(Number(minutesToAdd)));
-            return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
-        }
-
-        function updateSetupTimes() {
-            function updateForIds(startId, durationId, endId, extraEndId) {
-                const startEl = document.getElementById(startId);
-                const durationEl = document.getElementById(durationId);
-                const endEl = document.getElementById(endId);
-                const extraEl = document.getElementById(extraEndId);
-                if (!startEl || !durationEl || !endEl || !extraEl) return;
-
-                const startTime = startEl.value;
-                const duration = durationEl.value;
-                if (!startTime || !duration) return;
-
-                endEl.textContent = calculateTime(startTime, duration);
-                extraEl.textContent = calculateTime(startTime, Math.round(Number(duration) * 1.25));
-            }
-
-            // First exam uses its own duration and the chosen start time
-            updateForIds('start-time-input', 'duration-input', 'setup-end-time', 'setup-extra-end-time');
-            // Second exam (if used) shares the same start time but can have a different duration
-            updateForIds('start-time-input', 'duration2-input', 'setup2-end-time', 'setup2-extra-end-time');
-        }
-
-        function updateSystemClock() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('en-GB', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            const singleTimeEl = document.getElementById('current-system-time-display');
-            if (singleTimeEl) singleTimeEl.textContent = timeString;
-
-            const dualTimeEl = document.getElementById('dual-current-system-time-display');
-            if (dualTimeEl) dualTimeEl.textContent = timeString;
-        }
-
-        function setAlignment(state) {
-            if (state === 'running') {
-                appContainer.classList.remove('justify-center');
-                appContainer.classList.add('justify-start', 'pt-8');
-            } else {
-                appContainer.classList.remove('justify-start', 'pt-8');
-                appContainer.classList.add('justify-center');
-            }
-        }
-
-        function startExam() {
-            const examName = document.getElementById('exam-name-input').value || 'Exam In Progress';
-            const startTimeValue = document.getElementById('start-time-input').value;
-            const durationValue = document.getElementById('duration-input').value;
-            const centerNumber = document.getElementById('center-number-input').value;
-            const paperCode = document.getElementById('paper-code-input').value;
-
-            const exam2Name = (document.getElementById('exam2-name-input').value || '').trim();
-            const duration2Value = document.getElementById('duration2-input').value;
-            const centerNumber2 = (document.getElementById('center-number2-input').value || '').trim();
-            const paperCode2 = (document.getElementById('paper-code2-input').value || '').trim();
-
-            if (!startTimeValue || !durationValue) {
-                alert('Please enter a valid start time and duration for the first exam.');
-                return;
-            }
-
-            const examCountInput = document.querySelector('input[name="exam-count"]:checked');
-            const hasSecondExam = examCountInput && examCountInput.value === '2';
-
-            if (hasSecondExam) {
-                if (!exam2Name || !duration2Value) {
-                    alert('Please fill in the second exam details or switch back to "1 Exam".');
-                    return;
-                }
-            }
-
-            const headerTitleEl = document.getElementById('header-title');
-            const headerInfoEl = document.getElementById('header-info');
-
-            if (hasSecondExam) {
-                // Dual exam view
-                const exam1End = calculateTime(startTimeValue, durationValue);
-                const exam1ExtraEnd = calculateTime(startTimeValue, Math.round(Number(durationValue) * 1.25));
-                const exam2End = calculateTime(startTimeValue, duration2Value);
-                const exam2ExtraEnd = calculateTime(startTimeValue, Math.round(Number(duration2Value) * 1.25));
-
-                headerTitleEl.textContent = 'Exams In Progress';
-                headerInfoEl.innerHTML = '<p class="text-blue-200 text-lg">Monitoring 2 exams with live current time</p>';
-
-                document.getElementById('dual-exam1-title').textContent = examName;
-                document.getElementById('dual-exam1-center').textContent = centerNumber || '—';
-                document.getElementById('dual-exam1-paper').textContent = paperCode || '—';
-                document.getElementById('dual-exam1-start-time-display').textContent = startTimeValue;
-                document.getElementById('dual-exam1-end-time-display').textContent = exam1End;
-                document.getElementById('dual-exam1-extra-end-time-display').textContent = exam1ExtraEnd;
-
-                document.getElementById('dual-exam2-title').textContent = exam2Name || 'Second Exam';
-                document.getElementById('dual-exam2-center').textContent = centerNumber2 || '—';
-                document.getElementById('dual-exam2-paper').textContent = paperCode2 || '—';
-                document.getElementById('dual-exam2-start-time-display').textContent = startTimeValue;
-                document.getElementById('dual-exam2-end-time-display').textContent = exam2End;
-                document.getElementById('dual-exam2-extra-end-time-display').textContent = exam2ExtraEnd;
-
-                document.getElementById('single-exam-view').classList.add('hidden');
-                document.getElementById('dual-exam-view').classList.remove('hidden');
-            } else {
-                // Single exam view
-                document.getElementById('start-time-display').textContent = startTimeValue;
-                document.getElementById('end-time-display').textContent = calculateTime(startTimeValue, durationValue);
-                document.getElementById('extra-end-time-display').textContent = calculateTime(startTimeValue, Math.round(Number(durationValue) * 1.25));
-
-                headerTitleEl.textContent = examName;
-                headerInfoEl.innerHTML = `
-                <div class="flex items-center justify-center gap-10 text-3xl text-blue-100 bg-white/5 inline-flex px-10 py-4 rounded-full backdrop-blur-sm border border-white/10 whitespace-nowrap">
-                    ${centerNumber ? `<div class="flex items-center gap-4">
-                        <span class="uppercase tracking-widest text-[10px] font-semibold opacity-60">Center No</span>
-                        <span class="font-mono font-bold tracking-wider">${centerNumber}</span>
-                    </div>` : ''}
-                    ${centerNumber && paperCode ? `<div class="w-px bg-white/20 h-10 self-center"></div>` : ''}
-                    ${paperCode ? `<div class="flex items-center gap-4">
-                        <span class="uppercase tracking-widest text-[10px] font-semibold opacity-60">Paper Code</span>
-                        <span class="font-mono font-bold tracking-wider">${paperCode}</span>
-                    </div>` : ''}
-                </div>
-                `;
-
-                document.getElementById('single-exam-view').classList.remove('hidden');
-                document.getElementById('dual-exam-view').classList.add('hidden');
-            }
-
-            setAlignment('running');
-            document.getElementById('setup-state').classList.add('hidden');
-            document.getElementById('running-state').classList.remove('hidden');
-            updateSystemClock();
-        }
-
-        function resetExam() {
-            setAlignment('setup');
-            document.getElementById('running-state').classList.add('hidden');
-            document.getElementById('setup-state').classList.remove('hidden');
-            document.getElementById('header-title').textContent = 'Exam Timer Setup';
-            document.getElementById('header-info').innerHTML = '<p class="text-blue-200 text-lg">Configure your exam details and schedule</p>';
-            const singleView = document.getElementById('single-exam-view');
-            const dualView = document.getElementById('dual-exam-view');
-            if (singleView) singleView.classList.remove('hidden');
-            if (dualView) dualView.classList.add('hidden');
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            updateSystemClock();
-            setInterval(updateSystemClock, 1000);
-            updateSetupTimes();
-            setAlignment('setup');
         });
     </script>
 </body>
