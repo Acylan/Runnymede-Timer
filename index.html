@@ -24,7 +24,7 @@
             />
         </div>
 
-        <div class="relative z-10 w-full max-w-[95vw] space-y-8">
+        <div class="relative z-10 w-full max-w-[98vw] space-y-8">
             <!-- Page header -->
             <div class="text-center space-y-4">
                 <h1 id="header-title" class="text-5xl md:text-7xl font-bold tracking-tight text-white drop-shadow-lg">
@@ -63,7 +63,7 @@
                         </div>
 
                         <div class="bg-slate-800/40 backdrop-blur-xl border border-blue-500/20 shadow-xl rounded-xl">
-                            <div class="flex flex-col items-center justify-center py-10 px-8">
+                            <div class="flex flex-col items-center justify-center py-10 px-2">
                                 <div class="text-sm uppercase tracking-widest text-blue-400/80 mb-2 font-semibold">End Time</div>
                                 <div id="end-time-display" class="text-8xl font-mono font-bold text-white drop-shadow-md">
                                     11:00
@@ -91,11 +91,11 @@
 
                 <!-- Dual-exam layout -->
                 <div id="dual-exam-view" class="hidden max-w-[95vw] mx-auto space-y-4">
-                    <div class="grid grid-cols-1 xl:grid-cols-[0.8fr_1.9fr_0.8fr] gap-4 items-stretch min-h-[650px]">
+                    <div class="grid grid-cols-1 xl:grid-cols-[0.7fr_1.9fr_0.7fr] gap-4 items-stretch min-h-[550px]">
                         <!-- Left exam -->
-                        <div class="flex flex-col h-full p-4 md:p-6 gap-6">
+                        <div class="flex flex-col h-full p-4 md:p-0 gap-6">
                             <div class="space-y-3 text-center">
-                                <h2 id="dual-exam1-title" class="text-5xl font-semibold tracking-tight text-white">
+                                <h2 id="dual-exam1-title" class="text-4xl font-semibold tracking-tight text-white">
                                     Exam 1
                                 </h2>
                                 <div class="inline-flex items-start justify-center gap-6 bg-white/5 rounded-full border border-white/10 px-6 py-3 text-sm text-blue-50 w-full max-w-md mx-auto">
@@ -112,19 +112,19 @@
                             </div>
 
                             <div class="flex flex-col flex-1 gap-4">
-                                <div class="bg-slate-800/40 backdrop-blur-xl border border-green-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-2 px-5">
+                                <div class="bg-slate-800/40 backdrop-blur-xl border border-green-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-2 px-3">
                                     <div class="text-xs uppercase tracking-[0.18em] text-green-400/80 mb-2 font-semibold">Start Time</div>
                                     <div id="dual-exam1-start-time-display" class="text-5xl md:text-6xl font-mono font-bold text-white/80 drop-shadow-md">
                                         09:00
                                     </div>
                                 </div>
-                                <div class="bg-slate-800/40 backdrop-blur-xl border border-blue-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-8 px-7">
+                                <div class="bg-slate-800/40 backdrop-blur-xl border border-blue-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-8 px-5">
                                     <div class="text-sm uppercase tracking-[0.18em] text-blue-400/80 mb-2 font-semibold">End Time</div>
                                     <div id="dual-exam1-end-time-display" class="text-7xl md:text-8xl font-mono font-bold text-white drop-shadow-md">
                                         10:30
                                     </div>
                                 </div>
-                                <div class="bg-slate-800/40 backdrop-blur-xl border border-amber-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-2 px-5">
+                                <div class="bg-slate-800/40 backdrop-blur-xl border border-amber-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-2 px-3">
                                     <div class="text-xs uppercase tracking-[0.18em] text-amber-400/80 mb-2 font-semibold">Extra Time End</div>
                                     <div id="dual-exam1-extra-end-time-display" class="text-4xl md:text-5xl font-mono font-bold italic text-white/80 drop-shadow-md">
                                         10:53
@@ -134,20 +134,20 @@
                         </div>
 
                         <!-- Center current-time column -->
-                        <div class="bg-slate-800/40 backdrop-blur-xl border-2 border-blue-400/30 shadow-2xl rounded-2xl flex flex-col items-center justify-center px-8 py-8 h-[600px]">
+                        <div class="bg-slate-800/40 backdrop-blur-xl border-2 border-blue-400/30 shadow-2xl rounded-2xl flex flex-col items-center justify-center px-2 py-8 h-[500px]">
                             <div class="text-lg uppercase tracking-[0.2em] text-blue-300 mb-6 font-semibold flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                 CURRENT TIME
                             </div>
-                            <div id="dual-current-system-time-display" class="text-7xl md:text-[5.5rem] lg:text-[6.5rem] xl:text-[7rem] leading-none font-mono font-bold text-white tracking-wider time-shadow-primary">
+                            <div id="dual-current-system-time-display" class="text-6xl md:text-[5.5rem] lg:text-[6.5rem] xl:text-[7rem] leading-none font-mono font-bold text-white tracking-wider time-shadow-primary">
                                 00:00:00
                             </div>
                         </div>
 
                         <!-- Right exam -->
-                        <div class="flex flex-col h-full p-4 md:p-6 gap-6">
+                        <div class="flex flex-col h-full p-4 md:p-0 gap-6">
                             <div class="space-y-3 text-center">
-                                <h2 id="dual-exam2-title" class="text-5xl font-semibold tracking-tight text-white">
+                                <h2 id="dual-exam2-title" class="text-4xl font-semibold tracking-tight text-white">
                                     Exam 2
                                 </h2>
                                 <div class="inline-flex items-start justify-center gap-6 bg-white/5 rounded-full border border-white/10 px-6 py-3 text-sm text-blue-50 w-full max-w-md mx-auto">
@@ -164,19 +164,19 @@
                             </div>
 
                             <div class="flex flex-col flex-1 gap-4">
-                                <div class="bg-slate-800/40 backdrop-blur-xl border border-green-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-2 px-5">
+                                <div class="bg-slate-800/40 backdrop-blur-xl border border-green-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-2 px-3">
                                     <div class="text-xs uppercase tracking-[0.18em] text-green-400/80 mb-2 font-semibold">Start Time</div>
                                     <div id="dual-exam2-start-time-display" class="text-5xl md:text-6xl font-mono font-bold text-white/80 drop-shadow-md">
                                         09:00
                                     </div>
                                 </div>
-                                <div class="bg-slate-800/40 backdrop-blur-xl border border-blue-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-8 px-7">
+                                <div class="bg-slate-800/40 backdrop-blur-xl border border-blue-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-8 px-5">
                                     <div class="text-sm uppercase tracking-[0.18em] text-blue-400/80 mb-2 font-semibold">End Time</div>
                                     <div id="dual-exam2-end-time-display" class="text-7xl md:text-8xl font-mono font-bold text-white drop-shadow-md">
                                         10:30
                                     </div>
                                 </div>
-                                <div class="bg-slate-800/40 backdrop-blur-xl border border-amber-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-2 px-5">
+                                <div class="bg-slate-800/40 backdrop-blur-xl border border-amber-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-2 px-3">
                                     <div class="text-xs uppercase tracking-[0.18em] text-amber-400/80 mb-2 font-semibold">Extra Time End</div>
                                     <div id="dual-exam2-extra-end-time-display" class="text-4xl md:text-5xl font-mono font-bold italic text-white/80 drop-shadow-md">
                                         10:53
@@ -423,7 +423,7 @@
                     .classList.remove('text-7xl', 'md:text-[5.5rem]', 'lg:text-[6.5rem]', 'xl:text-[7rem]');
 
                 document.getElementById('dual-current-system-time-display')
-                    .classList.add('text-[6rem]', 'md:text-[8rem]', 'lg:text-[9rem]');
+                    .classList.add('text-[6rem]', 'md:text-[7rem]', 'lg:text-[8rem]');
                 if (!exam2.duration || exam2.duration <= 0) {
                     alert('Please enter a valid duration for Exam 2 (toggle to Exam 2 in the bar above the card).');
                     return;
