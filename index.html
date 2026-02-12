@@ -23,13 +23,16 @@
                 class="w-[1176px] h-[824px] object-contain opacity-30 blur-sm"
             />
         </div>
-
-        <div class="relative z-10 w-full max-w-[98vw] space-y-8">
+        
+        <div class="relative z-10 w-full max-w-[98vw] space-y-4">
             <!-- Page header -->
-            <div class="text-center space-y-4">
+            <div class="text-center space-y-2">
                 <h1 id="header-title" class="text-5xl md:text-7xl font-bold tracking-tight text-white drop-shadow-lg">
                     Exam Timer Setup
                 </h1>
+                <div id="header-date" class="text-2xl md:text-3xl text-blue-200 font-semibold mt-2">
+                    <!-- Date will appear here -->
+                </div>
                 <div id="header-info">
                     <p class="text-blue-200 text-lg">Configure your exam details and schedule</p>
                 </div>
@@ -90,23 +93,23 @@
                 </div>
 
                 <!-- Dual-exam layout -->
-                <div id="dual-exam-view" class="hidden max-w-[95vw] mx-auto space-y-4">
+                <div id="dual-exam-view" class="hidden max-w-[98vw] mx-auto space-y-4">
                     <div class="grid grid-cols-1 xl:grid-cols-[0.7fr_1.9fr_0.7fr] gap-4 items-stretch min-h-[550px]">
                         <!-- Left exam -->
                         <div class="flex flex-col h-full p-4 md:p-0 gap-6">
-                            <div class="space-y-3 text-center">
+                            <div class="space-y-3 text-center  xl:-mt-8">
                                 <h2 id="dual-exam1-title" class="text-4xl font-semibold tracking-tight text-white">
                                     Exam 1
                                 </h2>
-                                <div class="inline-flex items-start justify-center gap-6 bg-white/5 rounded-full border border-white/10 px-6 py-3 text-sm text-blue-50 w-full max-w-md mx-auto">
+                                <div class="inline-flex items-start justify-center gap-6 bg-white/5 rounded-full border border-white/10 px-6 py-2 text-sm text-blue-50 w-full max-w-md mx-auto">
                                     <div class="flex flex-col text-center">
                                         <span class="uppercase tracking-[0.18em] text-[10px] font-semibold opacity-70">Center No</span>
-                                        <span id="dual-exam1-center" class="text-lg font-mono font-bold tracking-wider">12345</span>
+                                        <span id="dual-exam1-center" class="text-2xl font-mono font-bold tracking-wider">12345</span>
                                     </div>
                                     <div class="h-9 w-px bg-white/20 self-stretch"></div>
                                     <div class="flex flex-col text-center">
                                         <span class="uppercase tracking-[0.18em] text-[10px] font-semibold opacity-70">Paper Code</span>
-                                        <span id="dual-exam1-paper" class="text-lg font-mono font-bold tracking-wider">9709/12</span>
+                                        <span id="dual-exam1-paper" class="text-2xl font-mono font-bold tracking-wider">9709/12</span>
                                     </div>
                                 </div>
                             </div>
@@ -134,7 +137,7 @@
                         </div>
 
                         <!-- Center current-time column -->
-                        <div class="bg-slate-800/40 backdrop-blur-xl border-2 border-blue-400/30 shadow-2xl rounded-2xl flex flex-col items-center justify-center px-2 py-8 h-[500px]">
+                        <div class="bg-slate-800/40 backdrop-blur-xl border-2 border-blue-400/30 shadow-2xl rounded-2xl flex flex-col items-center justify-center px-2 py-8 h-[520px] mt-4">
                             <div class="text-lg uppercase tracking-[0.2em] text-blue-300 mb-6 font-semibold flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                 CURRENT TIME
@@ -146,19 +149,19 @@
 
                         <!-- Right exam -->
                         <div class="flex flex-col h-full p-4 md:p-0 gap-6">
-                            <div class="space-y-3 text-center">
+                            <div class="space-y-3 text-center xl:-mt-8">
                                 <h2 id="dual-exam2-title" class="text-4xl font-semibold tracking-tight text-white">
                                     Exam 2
                                 </h2>
-                                <div class="inline-flex items-start justify-center gap-6 bg-white/5 rounded-full border border-white/10 px-6 py-3 text-sm text-blue-50 w-full max-w-md mx-auto">
+                                <div class="inline-flex items-start justify-center gap-6 bg-white/5 rounded-full border border-white/10 px-6 py-2 text-sm text-blue-50 w-full max-w-md mx-auto">
                                     <div class="flex flex-col text-center">
                                         <span class="uppercase tracking-[0.18em] text-[10px] font-semibold opacity-70">Center No</span>
-                                        <span id="dual-exam2-center" class="text-lg font-mono font-bold tracking-wider">12345</span>
+                                        <span id="dual-exam2-center" class="text-2xl font-mono font-bold tracking-wider">12345</span>
                                     </div>
                                     <div class="h-9 w-px bg-white/20 self-stretch"></div>
                                     <div class="flex flex-col text-center">
                                         <span class="uppercase tracking-[0.18em] text-[10px] font-semibold opacity-70">Paper Code</span>
-                                        <span id="dual-exam2-paper" class="text-lg font-mono font-bold tracking-wider">9702/22</span>
+                                        <span id="dual-exam2-paper" class="text-2xl font-mono font-bold tracking-wider">9702/22</span>
                                     </div>
                                 </div>
                             </div>
@@ -436,6 +439,7 @@
                 const exam2ExtraEnd = calculateTime(startTimeValue, Math.round(exam2.duration * 1.25));
 
                 headerTitleEl.textContent = 'Exams In Progress';
+                updateCurrentDate();
                 headerInfoEl.innerHTML = '';
 
                 // Populate left exam
@@ -464,8 +468,8 @@
                 document.getElementById('start-time-display').textContent = startTimeValue;
                 document.getElementById('end-time-display').textContent = exam1End;
                 document.getElementById('extra-end-time-display').textContent = exam1ExtraEnd;
-
                 headerTitleEl.textContent = exam1.name;
+                updateCurrentDate();
                 headerInfoEl.innerHTML = `
                     <div class="flex items-center justify-center gap-10 text-3xl text-blue-100 bg-white/5 inline-flex px-10 py-4 rounded-full backdrop-blur-sm border border-white/10 whitespace-nowrap">
                         ${exam1.center ? `<div class="flex items-center gap-4">
@@ -538,6 +542,9 @@
                 radio.addEventListener('change', handleExamCountChange);
             });
 
+            updateCurrentDate();
+            setInterval(updateCurrentDate, 60000);
+
             const tab1 = document.getElementById('exam-tab-1');
             const tab2 = document.getElementById('exam-tab-2');
             if (tab1) tab1.addEventListener('click', () => handleExamTabClick(1));
@@ -553,6 +560,33 @@
                 }
             });
         });
+        function updateCurrentDate() {
+            const now = new Date();
+
+            const dateString = now.toLocaleDateString('en-GB', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+
+            const headerDateEl = document.getElementById('header-date');
+            if (headerDateEl) {
+                headerDateEl.textContent = dateString;
+            }
+        }     
+        tailwind.config = {
+            theme: {
+            screens: {
+                sm: '640px',
+                md: '768px',
+                lg: '1024px',
+                xl: '1340px',   // changed from 1280px
+                '2xl': '1536px',
+            }
+            }
+        }
+
     </script>
 </body>
 </html>
