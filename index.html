@@ -10,84 +10,227 @@
         input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(1); }
         .shadcn-input { display: flex; width: 100%; border-radius: 0.375rem; padding: 0.25rem 0.5rem; font-size: 1rem; line-height: 1.5rem; --tw-ring-offset-width: 0px; --tw-ring-color: transparent; }
         .shadcn-label { font-size: 0.875rem; font-weight: 500; line-height: 1.25rem; }
+
+        /* Mode selection */
+        .mode-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        .mode-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(59,130,246,0.25);
+        }
+        .mode-card.selected {
+            border-color: rgba(59,130,246,0.8);
+            background: rgba(59,130,246,0.15);
+        }
+
+        /* Countdown ring */
+        .countdown-ring-container {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .countdown-ring {
+            transform: rotate(-90deg);
+            transition: stroke-dashoffset 1s linear;
+        }
+        .countdown-ring-track {
+            stroke: rgba(255,255,255,0.08);
+        }
+        .countdown-ring-progress {
+            stroke: #3b82f6;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 8px rgba(59,130,246,0.6));
+            transition: stroke-dashoffset 1s linear, stroke 0.5s ease;
+        }
+        .countdown-ring-progress.warning {
+            stroke: #f59e0b;
+            filter: drop-shadow(0 0 8px rgba(245,158,11,0.6));
+        }
+        .countdown-ring-progress.danger {
+            stroke: #ef4444;
+            filter: drop-shadow(0 0 8px rgba(239,68,68,0.6));
+            animation: pulse-ring 0.5s ease-in-out infinite alternate;
+        }
+        @keyframes pulse-ring {
+            from { filter: drop-shadow(0 0 4px rgba(239,68,68,0.4)); }
+            to { filter: drop-shadow(0 0 16px rgba(239,68,68,1)); }
+        }
+        .countdown-inner {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Loop indicator dots */
+        .loop-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            transition: all 0.3s ease;
+        }
+        .loop-dot.completed {
+            background: #3b82f6;
+            box-shadow: 0 0 8px rgba(59,130,246,0.6);
+        }
+        .loop-dot.active {
+            background: #60a5fa;
+            box-shadow: 0 0 12px rgba(96,165,250,0.8);
+            animation: dot-pulse 1s ease-in-out infinite;
+        }
+        @keyframes dot-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        /* Flash animation on countdown complete */
+        @keyframes flash-complete {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .flash-complete {
+            animation: flash-complete 0.4s ease 3;
+        }
+
+        /* Slide transitions */
+        .slide-in {
+            animation: slideIn 0.4s cubic-bezier(0.4,0,0.2,1) forwards;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Number input arrows hidden */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+
+        /* Glowing border animation */
+        @keyframes border-glow {
+            0%, 100% { border-color: rgba(59,130,246,0.3); }
+            50% { border-color: rgba(59,130,246,0.8); }
+        }
+        .glow-border { animation: border-glow 2s ease-in-out infinite; }
     </style>
 </head>
 <body class="bg-slate-900">
-    <div id="app" class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white p-4 flex flex-col items-center justify-center relative overflow-hidden">
-        
-        <!-- Runnymede logo background -->
-        <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden z-0">
-            <img 
-                src="./assets/Runnymede logo.png" 
-                alt="Exam Logo" 
-                class="w-[1176px] h-[824px] object-contain opacity-30 blur-sm"
-            />
+<div id="app" class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white p-4 flex flex-col items-center justify-center relative overflow-hidden">
+
+    <!-- Background logo -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden z-0">
+        <img src="./assets/Runnymede logo.png" alt="Exam Logo"
+             class="w-[1176px] h-[824px] object-contain opacity-30 blur-sm" />
+    </div>
+
+    <div class="relative z-10 w-full max-w-[98vw] space-y-4">
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!--                  MODE SELECTION                 -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div id="mode-selection" class="slide-in">
+            <div class="text-center space-y-3 mb-10">
+                <h1 class="text-5xl md:text-7xl font-bold tracking-tight text-white drop-shadow-lg">Timer Suite</h1>
+                <p class="text-blue-300 text-xl">Select a timer mode to get started</p>
+                <div id="mode-date" class="text-2xl text-blue-200 font-semibold"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+                <!-- Exam Timer Card -->
+                <div class="mode-card bg-slate-800/60 backdrop-blur-xl border-2 border-slate-600/50 rounded-2xl p-8 text-center space-y-4"
+                     onclick="selectMode('exam')">
+                    <div class="w-20 h-20 mx-auto bg-blue-500/20 rounded-2xl flex items-center justify-center border border-blue-400/30">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white mb-2">Exam Timer</h2>
+                        <p class="text-slate-400 text-sm leading-relaxed">Display start, end & extra time for up to two simultaneous exams. Live clock always visible.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 justify-center">
+                        <span class="text-xs bg-blue-500/20 text-blue-300 border border-blue-400/30 px-3 py-1 rounded-full">Live Clock</span>
+                        <span class="text-xs bg-blue-500/20 text-blue-300 border border-blue-400/30 px-3 py-1 rounded-full">Extra Time</span>
+                        <span class="text-xs bg-blue-500/20 text-blue-300 border border-blue-400/30 px-3 py-1 rounded-full">Dual Exams</span>
+                    </div>
+                </div>
+
+                <!-- Countdown Timer Card -->
+                <div class="mode-card bg-slate-800/60 backdrop-blur-xl border-2 border-slate-600/50 rounded-2xl p-8 text-center space-y-4"
+                     onclick="selectMode('countdown')">
+                    <div class="w-20 h-20 mx-auto bg-amber-500/20 rounded-2xl flex items-center justify-center border border-amber-400/30">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white mb-2">Countdown Loop</h2>
+                        <p class="text-slate-400 text-sm leading-relaxed">Repeating countdown timer with sound alerts. Set duration, loop count (or infinite), and a custom header.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 justify-center">
+                        <span class="text-xs bg-amber-500/20 text-amber-300 border border-amber-400/30 px-3 py-1 rounded-full">Sound Alert</span>
+                        <span class="text-xs bg-amber-500/20 text-amber-300 border border-amber-400/30 px-3 py-1 rounded-full">Loops</span>
+                        <span class="text-xs bg-amber-500/20 text-amber-300 border border-amber-400/30 px-3 py-1 rounded-full">Infinite Mode</span>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div class="relative z-10 w-full max-w-[98vw] space-y-4">
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!--              EXAM TIMER (existing)              -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div id="exam-mode" class="hidden">
             <!-- Page header -->
-            <div class="text-center space-y-2">
-                <h1 id="header-title" class="text-5xl md:text-7xl font-bold tracking-tight text-white drop-shadow-lg">
-                    Exam Timer Setup
-                </h1>
-                <div id="header-date" class="text-2xl md:text-3xl text-blue-200 font-semibold mt-2">
-                    <!-- Date will appear here -->
-                </div>
-                <div id="header-info">
-                    <p class="text-blue-200 text-lg">Configure your exam details and schedule</p>
-                </div>
+            <div class="text-center space-y-2 mb-4">
+                <h1 id="header-title" class="text-5xl md:text-7xl font-bold tracking-tight text-white drop-shadow-lg">Exam Timer Setup</h1>
+                <div id="header-date" class="text-2xl md:text-3xl text-blue-200 font-semibold mt-2"></div>
+                <div id="header-info"><p class="text-blue-200 text-lg">Configure your exam details and schedule</p></div>
             </div>
 
             <!-- Running display -->
             <div id="running-state" class="hidden">
-                <!-- Single-exam layout (default) -->
                 <div id="single-exam-view" class="grid grid-cols-1 min-[1256px]:grid-cols-3 gap-6 max-w-[95vw] mx-auto">
-                    
                     <div class="lg:col-span-2 bg-slate-800/40 backdrop-blur-xl border-2 border-blue-400/30 shadow-2xl overflow-hidden rounded-xl">
                         <div class="flex flex-col items-center justify-center p-12 md:p-16 h-full">
                             <div class="text-lg uppercase tracking-[0.2em] text-blue-300 mb-6 font-semibold flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                 CURRENT TIME
                             </div>
-                            <div id="current-system-time-display" class="text-8xl md:text-[10rem] leading-none font-mono font-bold text-white tracking-wider time-shadow-primary">
-                                00:00:00
-                            </div>
+                            <div id="current-system-time-display" class="text-8xl md:text-[10rem] leading-none font-mono font-bold text-white tracking-wider time-shadow-primary">00:00:00</div>
                         </div>
                     </div>
-
                     <div class="lg:col-span-1 flex flex-col gap-4">
                         <div class="bg-slate-800/40 backdrop-blur-xl border border-green-500/20 shadow-xl rounded-xl opacity-70">
                             <div class="flex flex-col items-center justify-center py-4 px-6">
                                 <div class="text-xs uppercase tracking-widest text-green-400/80 mb-2 font-semibold">Start Time</div>
-                                <div id="start-time-display" class="text-5xl font-mono font-bold text-white drop-shadow-md">
-                                    09:00
-                                </div>
+                                <div id="start-time-display" class="text-5xl font-mono font-bold text-white drop-shadow-md">09:00</div>
                             </div>
                         </div>
-
                         <div class="bg-slate-800/40 backdrop-blur-xl border border-blue-500/20 shadow-xl rounded-xl">
                             <div class="flex flex-col items-center justify-center py-10 px-2">
                                 <div class="text-sm uppercase tracking-widest text-blue-400/80 mb-2 font-semibold">End Time</div>
-                                <div id="end-time-display" class="text-8xl font-mono font-bold text-white drop-shadow-md">
-                                    11:00
-                                </div>
+                                <div id="end-time-display" class="text-8xl font-mono font-bold text-white drop-shadow-md">11:00</div>
                             </div>
                         </div>
-
                         <div class="bg-slate-800/40 backdrop-blur-xl border border-amber-500/20 shadow-xl rounded-xl">
                             <div class="flex flex-col items-center justify-center py-4 px-6">
                                 <div class="text-xs uppercase tracking-widest text-amber-400/80 mb-2 font-semibold">Extra Time End</div>
-                                <div id="extra-end-time-display" class="text-5xl font-mono font-bold italic text-white drop-shadow-md">
-                                    11:30
-                                </div>
+                                <div id="extra-end-time-display" class="text-5xl font-mono font-bold italic text-white drop-shadow-md">11:30</div>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="col-span-full flex justify-center mt-2">
+                    <div class="col-span-full flex justify-center gap-4 mt-2">
                         <button onclick="resetExam()" class="text-slate-400 hover:text-white hover:bg-white/5 transition-colors p-3 rounded-lg flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6"/><path d="M21.1 17.5a9 9 0 1 1-2.2-8.5"/><path d="M21.5 2l-4 4"/></svg>
                             Reset / Configure New Exam
+                        </button>
+                        <button onclick="backToModeSelect()" class="text-slate-500 hover:text-white hover:bg-white/5 transition-colors p-3 rounded-lg flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                            Switch Mode
                         </button>
                     </div>
                 </div>
@@ -95,12 +238,9 @@
                 <!-- Dual-exam layout -->
                 <div id="dual-exam-view" class="hidden max-w-[98vw] mx-auto space-y-4">
                     <div class="grid grid-cols-1 xl:grid-cols-[0.7fr_1.9fr_0.7fr] gap-4 items-stretch min-h-[550px]">
-                        <!-- Left exam -->
                         <div class="flex flex-col h-full p-4 md:p-0 gap-6">
-                            <div class="space-y-3 text-center  xl:-mt-8">
-                                <h2 id="dual-exam1-title" class="text-4xl font-semibold tracking-tight text-white">
-                                    Exam 1
-                                </h2>
+                            <div class="space-y-3 text-center xl:-mt-8">
+                                <h2 id="dual-exam1-title" class="text-4xl font-semibold tracking-tight text-white">Exam 1</h2>
                                 <div class="inline-flex items-start justify-center gap-6 bg-white/5 rounded-full border border-white/10 px-6 py-2 text-sm text-blue-50 w-full max-w-md mx-auto">
                                     <div class="flex flex-col text-center">
                                         <span class="uppercase tracking-[0.18em] text-[10px] font-semibold opacity-70">Center No</span>
@@ -113,47 +253,32 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="flex flex-col flex-1 gap-4">
                                 <div class="bg-slate-800/40 backdrop-blur-xl border border-green-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-2 px-3">
                                     <div class="text-xs uppercase tracking-[0.18em] text-green-400/80 mb-2 font-semibold">Start Time</div>
-                                    <div id="dual-exam1-start-time-display" class="text-5xl md:text-6xl font-mono font-bold text-white/80 drop-shadow-md">
-                                        09:00
-                                    </div>
+                                    <div id="dual-exam1-start-time-display" class="text-5xl md:text-6xl font-mono font-bold text-white/80 drop-shadow-md">09:00</div>
                                 </div>
                                 <div class="bg-slate-800/40 backdrop-blur-xl border border-blue-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-8 px-5">
                                     <div class="text-sm uppercase tracking-[0.18em] text-blue-400/80 mb-2 font-semibold">End Time</div>
-                                    <div id="dual-exam1-end-time-display" class="text-7xl md:text-8xl font-mono font-bold text-white drop-shadow-md">
-                                        10:30
-                                    </div>
+                                    <div id="dual-exam1-end-time-display" class="text-7xl md:text-8xl font-mono font-bold text-white drop-shadow-md">10:30</div>
                                 </div>
                                 <div class="bg-slate-800/40 backdrop-blur-xl border border-amber-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-2 px-3">
                                     <div class="text-xs uppercase tracking-[0.18em] text-amber-400/80 mb-2 font-semibold">Extra Time End</div>
-                                    <div id="dual-exam1-extra-end-time-display" class="text-4xl md:text-5xl font-mono font-bold italic text-white/80 drop-shadow-md">
-                                        10:53
-                                    </div>
+                                    <div id="dual-exam1-extra-end-time-display" class="text-4xl md:text-5xl font-mono font-bold italic text-white/80 drop-shadow-md">10:53</div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Center current-time column -->
                         <div class="bg-slate-800/40 backdrop-blur-xl border-2 border-blue-400/30 shadow-2xl rounded-2xl flex flex-col items-center justify-center px-2 py-8 h-[520px] mt-4">
                             <div class="text-lg uppercase tracking-[0.2em] text-blue-300 mb-6 font-semibold flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                 CURRENT TIME
                             </div>
-                            <div id="dual-current-system-time-display" class="text-6xl md:text-[5.5rem] lg:text-[6.5rem] xl:text-[7rem] leading-none font-mono font-bold text-white tracking-wider time-shadow-primary">
-                                00:00:00
-                            </div>
+                            <div id="dual-current-system-time-display" class="text-6xl md:text-[5.5rem] lg:text-[6.5rem] xl:text-[7rem] leading-none font-mono font-bold text-white tracking-wider time-shadow-primary">00:00:00</div>
                         </div>
-
-                        <!-- Right exam -->
                         <div class="flex flex-col h-full p-4 md:p-0 gap-6">
                             <div class="space-y-3 text-center xl:-mt-8">
-                                <h2 id="dual-exam2-title" class="text-4xl font-semibold tracking-tight text-white">
-                                    Exam 2
-                                </h2>
-                                <div class="inline-flex items-start justify-center gap-6 bg-white/5 rounded-full border border-white/10 px-6 py-2 text-sm text-blue-50 w-full max-w-md mx-auto">
+                                <h2 id="dual-exam2-title" class="text-4xl font-semibold tracking-tight text-white">Exam 2</h2>
+                                <div class="inline-flex items-start justify-center gap-6 bg-white/5 rounded-full border border-white/10 px-6 py-3 text-sm text-blue-50 w-full max-w-md mx-auto">
                                     <div class="flex flex-col text-center">
                                         <span class="uppercase tracking-[0.18em] text-[10px] font-semibold opacity-70">Center No</span>
                                         <span id="dual-exam2-center" class="text-2xl font-mono font-bold tracking-wider">12345</span>
@@ -165,34 +290,30 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="flex flex-col flex-1 gap-4">
                                 <div class="bg-slate-800/40 backdrop-blur-xl border border-green-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-2 px-3">
                                     <div class="text-xs uppercase tracking-[0.18em] text-green-400/80 mb-2 font-semibold">Start Time</div>
-                                    <div id="dual-exam2-start-time-display" class="text-5xl md:text-6xl font-mono font-bold text-white/80 drop-shadow-md">
-                                        09:00
-                                    </div>
+                                    <div id="dual-exam2-start-time-display" class="text-5xl md:text-6xl font-mono font-bold text-white/80 drop-shadow-md">09:00</div>
                                 </div>
                                 <div class="bg-slate-800/40 backdrop-blur-xl border border-blue-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-8 px-5">
                                     <div class="text-sm uppercase tracking-[0.18em] text-blue-400/80 mb-2 font-semibold">End Time</div>
-                                    <div id="dual-exam2-end-time-display" class="text-7xl md:text-8xl font-mono font-bold text-white drop-shadow-md">
-                                        10:30
-                                    </div>
+                                    <div id="dual-exam2-end-time-display" class="text-7xl md:text-8xl font-mono font-bold text-white drop-shadow-md">10:30</div>
                                 </div>
                                 <div class="bg-slate-800/40 backdrop-blur-xl border border-amber-500/20 shadow-xl rounded-xl flex flex-col items-center justify-center py-2 px-3">
                                     <div class="text-xs uppercase tracking-[0.18em] text-amber-400/80 mb-2 font-semibold">Extra Time End</div>
-                                    <div id="dual-exam2-extra-end-time-display" class="text-4xl md:text-5xl font-mono font-bold italic text-white/80 drop-shadow-md">
-                                        10:53
-                                    </div>
+                                    <div id="dual-exam2-extra-end-time-display" class="text-4xl md:text-5xl font-mono font-bold italic text-white/80 drop-shadow-md">10:53</div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <div class="flex justify-center mt-2">
+                    <div class="flex justify-center gap-4 mt-2">
                         <button onclick="resetExam()" class="text-slate-400 hover:text-white hover:bg-white/5 transition-colors p-3 rounded-lg flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6"/><path d="M21.1 17.5a9 9 0 1 1-2.2-8.5"/><path d="M21.5 2l-4 4"/></svg>
                             Reset / Configure New Exam
+                        </button>
+                        <button onclick="backToModeSelect()" class="text-slate-500 hover:text-white hover:bg-white/5 transition-colors p-3 rounded-lg flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                            Switch Mode
                         </button>
                     </div>
                 </div>
@@ -201,21 +322,14 @@
             <!-- Setup form -->
             <div id="setup-state" class="">
                 <div class="max-w-4xl mx-auto space-y-4">
-                    <!-- Exam toggle bar (shown when 2 exams are selected) -->
                     <div id="exam-toggle-bar" class="hidden w-full">
                         <div class="w-full flex bg-slate-900/70 border border-blue-500/40 rounded-xl p-1 text-sm">
-                            <button id="exam-tab-1" type="button" class="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:text-white hover:bg-blue-500/40">
-                                Exam 1
-                            </button>
-                            <button id="exam-tab-2" type="button" class="flex-1 px-4 py-2 rounded-lg text-blue-200 hover:text-white hover:bg-blue-500/40 font-semibold">
-                                Exam 2
-                            </button>
+                            <button id="exam-tab-1" type="button" class="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:text-white hover:bg-blue-500/40">Exam 1</button>
+                            <button id="exam-tab-2" type="button" class="flex-1 px-4 py-2 rounded-lg text-blue-200 hover:text-white hover:bg-blue-500/40 font-semibold">Exam 2</button>
                         </div>
                     </div>
-
                     <div class="bg-slate-800/60 backdrop-blur-xl border border-slate-700 shadow-2xl rounded-xl">
-                        <div class="p-8 md:p-10 space-y-8">
-                            <!-- Top row: exam name, exam count radio, starting time -->
+                        <div class="p-8 md:p-10 space-y-6 md:pb-6 pb-4">
                             <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
                                 <div class="md:col-span-5 space-y-2">
                                     <label class="shadcn-label text-blue-200">Exam Name / Subject</label>
@@ -224,21 +338,13 @@
                                         <input type="text" id="exam-name-input" value="A-Level Maths" class="shadcn-input pl-10 bg-slate-900/50 border-slate-600 text-white h-11 text-lg focus:border-blue-500 transition-colors" />
                                     </div>
                                 </div>
-
                                 <div class="md:col-span-2 space-y-2">
                                     <label class="shadcn-label text-blue-100">Number of Exams</label>
                                     <div class="flex items-center gap-4 text-sm text-slate-200">
-                                        <label class="inline-flex items-center gap-2 cursor-pointer">
-                                            <input type="radio" name="exam-count" value="1" class="accent-blue-500" checked>
-                                            <span>1</span>
-                                        </label>
-                                        <label class="inline-flex items-center gap-2 cursor-pointer">
-                                            <input type="radio" name="exam-count" value="2" class="accent-blue-500">
-                                            <span>2</span>
-                                        </label>
+                                        <label class="inline-flex items-center gap-2 cursor-pointer"><input type="radio" name="exam-count" value="1" class="accent-blue-500" checked><span>1</span></label>
+                                        <label class="inline-flex items-center gap-2 cursor-pointer"><input type="radio" name="exam-count" value="2" class="accent-blue-500"><span>2</span></label>
                                     </div>
                                 </div>
-
                                 <div class="md:col-span-5 space-y-2">
                                     <label class="shadcn-label text-green-300">Starting Time</label>
                                     <div class="relative">
@@ -247,8 +353,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Exam details -->
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div class="space-y-2">
                                     <label class="shadcn-label text-blue-200">Center Number</label>
@@ -270,11 +374,14 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="pt-4">
+                            <div class="pt-4 flex flex-col justify-center align-center">
                                 <button onclick="startExam()" type="button" class="w-full h-14 text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg rounded-lg flex items-center justify-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-2 fill-current" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                                     START EXAM DISPLAY
+                                </button>
+                                <button onclick="backToModeSelect()" class="flex justify-center text-slate-500 hover:text-white hover:bg-white/5 transition-colors p-2 rounded-lg flex items-center text-sm mt-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                                    Back to mode selection
                                 </button>
                             </div>
                         </div>
@@ -282,311 +389,723 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <script>
-        const appContainer = document.getElementById('app');
+        <!-- ═══════════════════════════════════════════════ -->
+        <!--              COUNTDOWN LOOP TIMER               -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div id="countdown-mode" class="hidden">
 
-        function calculateTime(start, minutesToAdd) {
-            if (!start || minutesToAdd === undefined || minutesToAdd === null) return '--:--';
-            const [hours, minutes] = start.split(':').map(Number);
-            const date = new Date();
-            date.setHours(hours, minutes, 0, 0); 
-            date.setMinutes(date.getMinutes() + Math.round(Number(minutesToAdd)));
-            return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
-        }
+            <!-- Countdown Setup — mirrors exam setup-state styling exactly -->
+            <div id="countdown-setup" class="slide-in">
+                <div class="text-center space-y-2 mb-4">
+                    <h1 class="text-5xl md:text-7xl font-bold tracking-tight text-white drop-shadow-lg">Countdown Setup</h1>
+                    <div id="countdown-date-setup" class="text-2xl md:text-3xl text-blue-200 font-semibold mt-2"></div>
+                    <p class="text-blue-200 text-lg">Configure your repeating countdown timer</p>
+                </div>
 
-        function updateSetupTimes() {
-            const startTime = document.getElementById('start-time-input').value;
-            const duration = document.getElementById('duration-input').value;
-            if (!startTime || !duration) return;
-            document.getElementById('setup-end-time').textContent = calculateTime(startTime, duration);
-            document.getElementById('setup-extra-end-time').textContent = calculateTime(startTime, Math.round(Number(duration) * 1.25));
-        }
+                <div class="max-w-4xl mx-auto space-y-4">
+                    <div class="bg-slate-800/60 backdrop-blur-xl border border-slate-700 shadow-2xl rounded-xl">
+                        <div class="p-8 md:p-10 space-y-4 md:pb-6 pb-4">
 
-        function updateSystemClock() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('en-GB', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            const singleDisplay = document.getElementById('current-system-time-display');
-            if (singleDisplay) singleDisplay.textContent = timeString;
-            const dualDisplay = document.getElementById('dual-current-system-time-display');
-            if (dualDisplay) dualDisplay.textContent = timeString;
-        }
+                            <!-- Row 1: header name + duration -->
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+                                <div class="md:col-span-7 space-y-2">
+                                    <label class="shadcn-label text-blue-200">Timer Header / Label</label>
+                                    <div class="relative">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-3.5 h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20h-5.5"/><path d="M18 6h-8"/><path d="M18 10h-8"/><path d="M12 14h-2"/></svg>
+                                        <input type="text" id="countdown-header-input" value="Runnymede Timer" placeholder="e.g. Runnymede Timer"
+                                               class="shadcn-input pl-10 bg-slate-900/50 border-slate-600 text-white h-11 text-lg focus:border-blue-500 transition-colors" />
+                                    </div>
+                                </div>
+                                <div class="md:col-span-5 space-y-2">
+                                    <label class="shadcn-label text-blue-300">Duration</label>
+                                    <div class="flex items-center gap-2 bg-slate-900/50 border border-blue-500/30 rounded-md px-3 h-11">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                        <input type="number" id="countdown-minutes" value="5" min="0" max="99"
+                                               class="bg-transparent border-0 text-white h-full w-14 text-center font-mono focus-visible:ring-0 text-lg shadcn-input px-0" />
+                                        <span class="text-slate-400 text-sm shrink-0">min</span>
+                                        <div class="h-6 w-px bg-slate-700 mx-1"></div>
+                                        <input type="number" id="countdown-seconds" value="0" min="0" max="59"
+                                               class="bg-transparent border-0 text-white h-full w-14 text-center font-mono focus-visible:ring-0 text-lg shadcn-input px-0" />
+                                        <span class="text-slate-400 text-sm shrink-0">sec</span>
+                                    </div>
+                                </div>
+                            </div>
 
-        function setAlignment(state) {
-            if (state === 'running') {
-                appContainer.classList.remove('justify-center');
-                appContainer.classList.add('justify-start', 'pt-8');
-            } else {
-                appContainer.classList.remove('justify-start', 'pt-8');
-                appContainer.classList.add('justify-center');
-            }
-        }
+                            <!-- Row 2: loop mode -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div class="space-y-2">
+                                    <label class="shadcn-label text-blue-200">Loop Mode</label>
+                                    <div class="flex bg-slate-900/70 border border-blue-500/40 rounded-xl p-1 text-sm h-11">
+                                        <button id="loop-tab-infinite" type="button"
+                                                onclick="toggleLoopMode('infinite')"
+                                                class="flex-1 px-3 py-1.5 rounded-lg bg-blue-600 text-white font-semibold transition-colors">
+                                            ∞ Infinite
+                                        </button>
+                                        <button id="loop-tab-finite" type="button"
+                                                onclick="toggleLoopMode('finite')"
+                                                class="flex-1 px-3 py-1.5 rounded-lg text-blue-200 hover:text-white hover:bg-blue-500/40 font-semibold transition-colors">
+                                            Set Number
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="space-y-2 hidden" id="loop-count-input-wrapper">
+                                    <label class="shadcn-label text-blue-200">Number of Loops</label>
+                                    <div class="flex items-center gap-3 bg-slate-900/50 border border-blue-500/30 rounded-md p-1 pr-3 h-11">
+                                        <input type="number" id="loop-count-input" value="3" min="1" max="999"
+                                               class="bg-transparent border-0 text-white h-full w-full text-center font-mono focus-visible:ring-0 text-lg shadcn-input" />
+                                    </div>
+                                </div>
+                                <div class="space-y-2 flex flex-col justify-end">
+                                    <div class="bg-slate-900/30 border border-slate-700/50 rounded-md h-11 flex items-center px-4">
+                                        <span id="loop-mode-summary" class="text-blue-300 text-sm font-medium">Will loop indefinitely until stopped</span>
+                                    </div>
+                                </div>
+                            </div>
 
-        // Store configuration for up to two exams
-        const examConfigs = {
-            1: { name: '', center: '', paper: '', duration: 0 },
-            2: { name: '', center: '', paper: '', duration: 0 },
-        };
-        let currentEditingExam = 1;
-
-        function readFormIntoConfig(examIndex) {
-            const cfg = examConfigs[examIndex];
-            cfg.name = document.getElementById('exam-name-input').value || '';
-            cfg.center = document.getElementById('center-number-input').value || '';
-            cfg.paper = document.getElementById('paper-code-input').value || '';
-            cfg.duration = Number(document.getElementById('duration-input').value || 0);
-        }
-
-        function writeConfigToForm(examIndex) {
-            const cfg = examConfigs[examIndex];
-            document.getElementById('exam-name-input').value = cfg.name || '';
-            document.getElementById('center-number-input').value = cfg.center || '';
-            document.getElementById('paper-code-input').value = cfg.paper || '';
-            document.getElementById('duration-input').value = cfg.duration ? String(cfg.duration) : '';
-            updateSetupTimes();
-        }
-
-        function setActiveExamTab(examIndex) {
-            const tab1 = document.getElementById('exam-tab-1');
-            const tab2 = document.getElementById('exam-tab-2');
-            if (!tab1 || !tab2) return;
-
-            const activeClasses = ['bg-blue-600', 'text-white'];
-            const inactiveClasses = ['bg-transparent', 'text-blue-200'];
-
-            if (examIndex === 1) {
-                tab1.classList.add(...activeClasses);
-                tab1.classList.remove(...inactiveClasses);
-                tab2.classList.remove(...activeClasses);
-                tab2.classList.add(...inactiveClasses);
-            } else {
-                tab2.classList.add(...activeClasses);
-                tab2.classList.remove(...inactiveClasses);
-                tab1.classList.remove(...activeClasses);
-                tab1.classList.add(...inactiveClasses);
-            }
-        }
-
-        function handleExamTabClick(examIndex) {
-            if (currentEditingExam === examIndex) return;
-            readFormIntoConfig(currentEditingExam);
-            currentEditingExam = examIndex;
-            setActiveExamTab(examIndex);
-            writeConfigToForm(examIndex);
-        }
-
-        function getExamCount() {
-            const radio = document.querySelector('input[name="exam-count"]:checked');
-            return radio ? Number(radio.value) : 1;
-        }
-
-        function handleExamCountChange() {
-            const count = getExamCount();
-            const examToggleBar = document.getElementById('exam-toggle-bar');
-            if (examToggleBar) {
-                examToggleBar.classList.toggle('hidden', count === 1);
-            }
-
-            // If switching back to 1 exam, ensure form shows Exam 1 settings
-            if (count === 1 && currentEditingExam !== 1) {
-                readFormIntoConfig(currentEditingExam);
-                currentEditingExam = 1;
-                setActiveExamTab(1);
-                writeConfigToForm(1);
-            }
-        }
-
-        function startExam() {
-            const startTimeValue = document.getElementById('start-time-input').value;
-            if (!startTimeValue) {
-                alert('Please enter a starting time.');
-                return;
-            }
-
-            // Save current form to its exam config
-            readFormIntoConfig(currentEditingExam);
-
-            const examCount = getExamCount();
-            const exam1 = examConfigs[1];
-            const exam2 = examConfigs[2];
-
-            if (!exam1.duration || exam1.duration <= 0) {
-                alert('Please enter a valid duration for Exam 1.');
-                return;
-            }
-
-            if (!exam1.name) exam1.name = 'Exam 1';
-
-            const headerTitleEl = document.getElementById('header-title');
-            const headerInfoEl = document.getElementById('header-info');
-
-            if (examCount === 2) {
-                document.getElementById('dual-current-system-time-display')
-                    .classList.remove('text-7xl', 'md:text-[5.5rem]', 'lg:text-[6.5rem]', 'xl:text-[7rem]');
-
-                document.getElementById('dual-current-system-time-display')
-                    .classList.add('text-[6rem]', 'md:text-[7rem]', 'lg:text-[8rem]');
-                if (!exam2.duration || exam2.duration <= 0) {
-                    alert('Please enter a valid duration for Exam 2 (toggle to Exam 2 in the bar above the card).');
-                    return;
-                }
-                if (!exam2.name) exam2.name = 'Exam 2';
-
-                const exam1End = calculateTime(startTimeValue, exam1.duration);
-                const exam1ExtraEnd = calculateTime(startTimeValue, Math.round(exam1.duration * 1.25));
-                const exam2End = calculateTime(startTimeValue, exam2.duration);
-                const exam2ExtraEnd = calculateTime(startTimeValue, Math.round(exam2.duration * 1.25));
-
-                headerTitleEl.textContent = 'Exams In Progress';
-                updateCurrentDate();
-                headerInfoEl.innerHTML = '';
-
-                // Populate left exam
-                document.getElementById('dual-exam1-title').textContent = exam1.name;
-                document.getElementById('dual-exam1-center').textContent = exam1.center || '—';
-                document.getElementById('dual-exam1-paper').textContent = exam1.paper || '—';
-                document.getElementById('dual-exam1-start-time-display').textContent = startTimeValue;
-                document.getElementById('dual-exam1-end-time-display').textContent = exam1End;
-                document.getElementById('dual-exam1-extra-end-time-display').textContent = exam1ExtraEnd;
-
-                // Populate right exam
-                document.getElementById('dual-exam2-title').textContent = exam2.name;
-                document.getElementById('dual-exam2-center').textContent = exam2.center || '—';
-                document.getElementById('dual-exam2-paper').textContent = exam2.paper || '—';
-                document.getElementById('dual-exam2-start-time-display').textContent = startTimeValue;
-                document.getElementById('dual-exam2-end-time-display').textContent = exam2End;
-                document.getElementById('dual-exam2-extra-end-time-display').textContent = exam2ExtraEnd;
-
-                document.getElementById('single-exam-view').classList.add('hidden');
-                document.getElementById('dual-exam-view').classList.remove('hidden');
-            } else {
-                // Single-exam layout
-                const exam1End = calculateTime(startTimeValue, exam1.duration);
-                const exam1ExtraEnd = calculateTime(startTimeValue, Math.round(exam1.duration * 1.25));
-
-                document.getElementById('start-time-display').textContent = startTimeValue;
-                document.getElementById('end-time-display').textContent = exam1End;
-                document.getElementById('extra-end-time-display').textContent = exam1ExtraEnd;
-                headerTitleEl.textContent = exam1.name;
-                updateCurrentDate();
-                headerInfoEl.innerHTML = `
-                    <div class="flex items-center justify-center gap-10 text-3xl text-blue-100 bg-white/5 inline-flex px-10 py-4 rounded-full backdrop-blur-sm border border-white/10 whitespace-nowrap">
-                        ${exam1.center ? `<div class="flex items-center gap-4">
-                            <span class="uppercase tracking-widest text-[10px] font-semibold opacity-60">Center No</span>
-                            <span class="font-mono font-bold tracking-wider">${exam1.center}</span>
-                        </div>` : ''}
-                        ${(exam1.center && exam1.paper) ? `<div class="w-px bg-white/20 h-10 self-center"></div>` : ''}
-                        ${exam1.paper ? `<div class="flex items-center gap-4">
-                            <span class="uppercase tracking-widest text-[10px] font-semibold opacity-60">Paper Code</span>
-                            <span class="font-mono font-bold tracking-wider">${exam1.paper}</span>
-                        </div>` : ''}
+                            <div class="pt-4 flex flex-col justify-center align-center">
+                                <button onclick="startCountdown()" type="button"
+                                        class="w-full h-14 text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg rounded-lg flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-2 fill-current" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                    START COUNTDOWN
+                                </button>
+                                <button onclick="backToModeSelect()" class="flex justify-center text-slate-500 hover:text-white hover:bg-white/5 transition-colors p-2 rounded-lg flex items-center text-sm mt-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                                    Back to mode selection
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                `;
+                </div>
+            </div>
 
-                document.getElementById('single-exam-view').classList.remove('hidden');
-                document.getElementById('dual-exam-view').classList.add('hidden');
-            }
+            <!-- Countdown Running — mirrors exam running-state layout -->
+            <div id="countdown-running" class="hidden slide-in">
+                <!-- Header mirrors exam header exactly -->
+                <div class="text-center space-y-2 mb-4">
+                    <h1 id="countdown-display-header" class="text-5xl md:text-7xl font-bold tracking-tight text-white drop-shadow-lg">Reading Time</h1>
+                    <div id="countdown-date-running" class="text-2xl md:text-3xl text-blue-200 font-semibold"></div>
+                    <div id="countdown-loop-pill" class="inline-flex items-center justify-center gap-6 text-3xl text-blue-100 bg-white/5 px-10 py-4 rounded-full backdrop-blur-sm border border-white/10 whitespace-nowrap">
+                        <div class="flex items-center gap-4">
+                            <span class="uppercase tracking-widest text-[10px] font-semibold opacity-60">Loop</span>
+                            <span id="loop-counter-text" class="font-mono font-bold tracking-wider text-2xl">1</span>
+                        </div>
+                        <div class="w-px bg-white/20 h-10 self-center"></div>
+                        <div class="flex items-center gap-4">
+                            <span class="uppercase tracking-widest text-[10px] font-semibold opacity-60">Status</span>
+                            <span id="countdown-status-label" class="font-mono font-bold tracking-wider text-2xl text-blue-300">In Progress</span>
+                        </div>
+                    </div>
+                </div>
 
-            setAlignment('running');
-            document.getElementById('setup-state').classList.add('hidden');
-            document.getElementById('running-state').classList.remove('hidden');
-            updateSystemClock();
+                <!-- Main grid: countdown ring (left, 2/3) + info cards (right, 1/3) — mirrors single-exam-view -->
+                <div class="grid grid-cols-1 min-[1256px]:grid-cols-3 gap-6 max-w-[95vw] mx-auto">
+
+                    <!-- Left: ring + time — mirrors the large current-time card -->
+                    <div class="lg:col-span-2 bg-slate-800/40 backdrop-blur-xl border-2 border-blue-400/30 shadow-2xl overflow-hidden rounded-xl">
+                        <div class="flex flex-col items-center justify-center p-8 md:p-12 h-full gap-4">
+                            <div class="text-lg uppercase tracking-[0.2em] text-blue-300 font-semibold flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                COUNTDOWN
+                            </div>
+                            <div class="countdown-ring-container">
+                                <svg width="280" height="280" viewBox="0 0 280 280">
+                                    <circle class="countdown-ring-track" cx="140" cy="140" r="126" fill="none" stroke-width="10"/>
+                                    <circle id="countdown-ring-el" class="countdown-ring countdown-ring-progress" cx="140" cy="140" r="126"
+                                            fill="none" stroke-width="10"
+                                            stroke-dasharray="791.68"
+                                            stroke-dashoffset="0"/>
+                                </svg>
+                                <div class="countdown-inner text-center">
+                                    <div id="countdown-time-display" class="text-[82px] md:text-[152px] font-mono font-bold text-white tracking-wider leading-none time-shadow-primary">05:00</div>
+                                </div>
+                            </div>
+
+                            <!-- Loop dots inside main card -->
+                            <div class="w-full max-w-sm space-y-2">
+                                <div class="flex items-center justify-between text-xs uppercase tracking-widest text-slate-400 font-semibold px-1">
+                                    <span>Loop Progress</span>
+                                    <span id="loop-dots-label"></span>
+                                </div>
+                                <div id="loop-dots-container" class="flex flex-wrap gap-2 justify-center min-h-[22px]"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: info cards — mirrors the right column in single-exam-view -->
+                    <div class="lg:col-span-1 flex flex-col gap-4">
+                        <!-- Current time card — same as exam's green start-time card -->
+                        <div class="bg-slate-800/40 backdrop-blur-xl border border-green-500/20 shadow-xl rounded-xl opacity-90 flex-1 flex flex-col items-center justify-center">
+                            <div class="flex flex-col items-center justify-center py-8 px-6">
+                                <div class="text-[16px] uppercase tracking-widest text-green-400/80 mb-2 font-[600]">Current Time</div>
+                                <div id="countdown-system-clock" class="text-[96px] font-mono font-[900] text-white drop-shadow-md">00:00:00</div>
+                            </div>
+                        </div>
+
+                        <!-- Controls card — same border/bg style as exam's blue end-time card -->
+                        <div class="bg-slate-800/40 backdrop-blur-xl border border-blue-500/20 shadow-xl rounded-xl flex-1">
+                            <div class="flex flex-col items-center justify-center py-8 px-6 gap-4 h-full">
+                                <div class="text-sm uppercase tracking-widest text-blue-400/80 font-semibold">Controls</div>
+                                <div class="flex flex-col gap-3 w-full">
+                                    <button id="pause-btn" onclick="togglePause()"
+                                            class="w-full h-12 bg-slate-700/60 hover:bg-blue-600/40 border border-slate-600 hover:border-blue-400/50 text-white rounded-xl font-semibold transition-all flex items-center justify-center gap-2">
+                                        <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                                        <span id="pause-label">Pause</span>
+                                    </button>
+                                    <button onclick="skipLoop()"
+                                            class="w-full h-12 bg-slate-700/60 hover:bg-slate-600/60 border border-slate-600 text-white rounded-xl font-semibold transition-all flex items-center justify-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/></svg>
+                                        Skip Loop
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Finished / status card — mirrors amber extra-time card -->
+                    </div>
+
+                    <!-- All-done banner -->
+                    <div id="countdown-finished" class="col-span-full hidden bg-slate-800/40 backdrop-blur-xl border border-green-400/30 rounded-xl shadow-xl">
+                        <div class="flex flex-col items-center justify-center py-6 px-8 text-center gap-2">
+                            <div class="text-green-400 text-3xl font-bold">✓ All Loops Complete</div>
+                            <div id="countdown-finished-text" class="text-slate-300 text-lg"></div>
+                        </div>
+                    </div>
+
+                    <div class="col-span-full flex justify-center gap-4 mt-2">
+                        <button onclick="resetCountdown()" class="text-slate-400 hover:text-white hover:bg-white/5 transition-colors p-3 rounded-lg flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6"/><path d="M21.1 17.5a9 9 0 1 1-2.2-8.5"/><path d="M21.5 2l-4 4"/></svg>
+                            Reset / Reconfigure
+                        </button>
+                        <button onclick="backToModeSelect()" class="text-slate-500 hover:text-white hover:bg-white/5 transition-colors p-3 rounded-lg flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                            Switch Mode
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // ─────────────────────────────────────────────
+    //              SHARED UTILITIES
+    // ─────────────────────────────────────────────
+    const appContainer = document.getElementById('app');
+
+    function updateCurrentDate() {
+        const now = new Date();
+        const dateString = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        ['header-date', 'mode-date', 'countdown-date-setup', 'countdown-date-running'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = dateString;
+        });
+    }
+
+    function calculateTime(start, minutesToAdd) {
+        if (!start || minutesToAdd === undefined || minutesToAdd === null) return '--:--';
+        const [hours, minutes] = start.split(':').map(Number);
+        const date = new Date();
+        date.setHours(hours, minutes, 0, 0);
+        date.setMinutes(date.getMinutes() + Math.round(Number(minutesToAdd)));
+        return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+    }
+
+    function updateSystemClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-GB', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        ['current-system-time-display', 'dual-current-system-time-display', 'countdown-system-clock'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = timeString;
+        });
+    }
+
+    function setAlignment(state) {
+        if (state === 'running') {
+            appContainer.classList.remove('justify-center');
+            appContainer.classList.add('justify-start', 'pt-8');
+        } else {
+            appContainer.classList.remove('justify-start', 'pt-8');
+            appContainer.classList.add('justify-center');
         }
+    }
 
-        function resetExam() {
-            setAlignment('setup');
-            document.getElementById('running-state').classList.add('hidden');
-            document.getElementById('setup-state').classList.remove('hidden');
-            document.getElementById('header-title').textContent = 'Exam Timer Setup';
-            document.getElementById('header-info').innerHTML = '<p class="text-blue-200 text-lg">Configure your exam details and schedule</p>';
-
-            const singleView = document.getElementById('single-exam-view');
-            const dualView = document.getElementById('dual-exam-view');
-            if (singleView && dualView) {
-                singleView.classList.remove('hidden');
-                dualView.classList.add('hidden');
-            }
-
-            // Reset exam count back to 1 and hide toggle bar
-            const examCountRadios = document.querySelectorAll('input[name="exam-count"]');
-            examCountRadios.forEach(radio => {
-                radio.checked = radio.value === '1';
-            });
-            handleExamCountChange();
+    // ─────────────────────────────────────────────
+    //              MODE SELECTION
+    // ─────────────────────────────────────────────
+    function selectMode(mode) {
+        document.getElementById('mode-selection').classList.add('hidden');
+        if (mode === 'exam') {
+            document.getElementById('exam-mode').classList.remove('hidden');
+        } else if (mode === 'countdown') {
+            document.getElementById('countdown-mode').classList.remove('hidden');
+            document.getElementById('countdown-setup').classList.remove('hidden');
+            document.getElementById('countdown-running').classList.add('hidden');
         }
+    }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // Initialize exam config 1 from default form values
-            examConfigs[1].name = document.getElementById('exam-name-input').value || '';
-            examConfigs[1].center = document.getElementById('center-number-input').value || '';
-            examConfigs[1].paper = document.getElementById('paper-code-input').value || '';
-            examConfigs[1].duration = Number(document.getElementById('duration-input').value || 0);
-            // Default Exam 2 duration same as Exam 1 (can be changed)
-            examConfigs[2] = {
-                name: 'A-Level Physics',
-                center: examConfigs[1].center || '',
-                paper: '9702/22',
-                duration: 90
-            };
+    function backToModeSelect() {
+        // Stop countdown if running
+        stopCountdownTimer();
 
-            updateSystemClock();
-            setInterval(updateSystemClock, 1000);
-            updateSetupTimes();
-            setAlignment('setup');
+        document.getElementById('exam-mode').classList.add('hidden');
+        document.getElementById('countdown-mode').classList.add('hidden');
+        document.getElementById('mode-selection').classList.remove('hidden');
+        document.getElementById('mode-selection').classList.add('slide-in');
+        setAlignment('setup');
+
+        // Reset exam state
+        resetExamInternal();
+    }
+
+    // ─────────────────────────────────────────────
+    //              EXAM TIMER LOGIC
+    // ─────────────────────────────────────────────
+    const examConfigs = {
+        1: { name: '', center: '', paper: '', duration: 0 },
+        2: { name: '', center: '', paper: '', duration: 0 },
+    };
+    let currentEditingExam = 1;
+
+    function updateSetupTimes() {
+        const startTime = document.getElementById('start-time-input').value;
+        const duration = document.getElementById('duration-input').value;
+        if (!startTime || !duration) return;
+        document.getElementById('setup-end-time').textContent = calculateTime(startTime, duration);
+        document.getElementById('setup-extra-end-time').textContent = calculateTime(startTime, Math.round(Number(duration) * 1.25));
+    }
+
+    function readFormIntoConfig(examIndex) {
+        const cfg = examConfigs[examIndex];
+        cfg.name = document.getElementById('exam-name-input').value || '';
+        cfg.center = document.getElementById('center-number-input').value || '';
+        cfg.paper = document.getElementById('paper-code-input').value || '';
+        cfg.duration = Number(document.getElementById('duration-input').value || 0);
+    }
+
+    function writeConfigToForm(examIndex) {
+        const cfg = examConfigs[examIndex];
+        document.getElementById('exam-name-input').value = cfg.name || '';
+        document.getElementById('center-number-input').value = cfg.center || '';
+        document.getElementById('paper-code-input').value = cfg.paper || '';
+        document.getElementById('duration-input').value = cfg.duration ? String(cfg.duration) : '';
+        updateSetupTimes();
+    }
+
+    function setActiveExamTab(examIndex) {
+        const tab1 = document.getElementById('exam-tab-1');
+        const tab2 = document.getElementById('exam-tab-2');
+        if (!tab1 || !tab2) return;
+        const activeClasses = ['bg-blue-600', 'text-white'];
+        const inactiveClasses = ['bg-transparent', 'text-blue-200'];
+        if (examIndex === 1) {
+            tab1.classList.add(...activeClasses); tab1.classList.remove(...inactiveClasses);
+            tab2.classList.remove(...activeClasses); tab2.classList.add(...inactiveClasses);
+        } else {
+            tab2.classList.add(...activeClasses); tab2.classList.remove(...inactiveClasses);
+            tab1.classList.remove(...activeClasses); tab1.classList.add(...inactiveClasses);
+        }
+    }
+
+    function handleExamTabClick(examIndex) {
+        if (currentEditingExam === examIndex) return;
+        readFormIntoConfig(currentEditingExam);
+        currentEditingExam = examIndex;
+        setActiveExamTab(examIndex);
+        writeConfigToForm(examIndex);
+    }
+
+    function getExamCount() {
+        const radio = document.querySelector('input[name="exam-count"]:checked');
+        return radio ? Number(radio.value) : 1;
+    }
+
+    function handleExamCountChange() {
+        const count = getExamCount();
+        const examToggleBar = document.getElementById('exam-toggle-bar');
+        if (examToggleBar) examToggleBar.classList.toggle('hidden', count === 1);
+        if (count === 1 && currentEditingExam !== 1) {
+            readFormIntoConfig(currentEditingExam);
+            currentEditingExam = 1;
             setActiveExamTab(1);
-            handleExamCountChange();
+            writeConfigToForm(1);
+        }
+    }
 
-            const examCountRadios = document.querySelectorAll('input[name="exam-count"]');
-            examCountRadios.forEach(radio => {
-                radio.addEventListener('change', handleExamCountChange);
-            });
+    function startExam() {
+        const startTimeValue = document.getElementById('start-time-input').value;
+        if (!startTimeValue) { alert('Please enter a starting time.'); return; }
+        readFormIntoConfig(currentEditingExam);
+        const examCount = getExamCount();
+        const exam1 = examConfigs[1];
+        const exam2 = examConfigs[2];
+        if (!exam1.duration || exam1.duration <= 0) { alert('Please enter a valid duration for Exam 1.'); return; }
+        if (!exam1.name) exam1.name = 'Exam 1';
+        const headerTitleEl = document.getElementById('header-title');
+        const headerInfoEl = document.getElementById('header-info');
 
+        if (examCount === 2) {
+            document.getElementById('dual-current-system-time-display').classList.remove('text-7xl','md:text-[5.5rem]','lg:text-[6.5rem]','xl:text-[7rem]');
+            document.getElementById('dual-current-system-time-display').classList.add('text-[6rem]','md:text-[7rem]','lg:text-[8rem]');
+            if (!exam2.duration || exam2.duration <= 0) { alert('Please enter a valid duration for Exam 2.'); return; }
+            if (!exam2.name) exam2.name = 'Exam 2';
+            const exam1End = calculateTime(startTimeValue, exam1.duration);
+            const exam1ExtraEnd = calculateTime(startTimeValue, Math.round(exam1.duration * 1.25));
+            const exam2End = calculateTime(startTimeValue, exam2.duration);
+            const exam2ExtraEnd = calculateTime(startTimeValue, Math.round(exam2.duration * 1.25));
+            headerTitleEl.textContent = 'Exams In Progress';
             updateCurrentDate();
-            setInterval(updateCurrentDate, 60000);
+            headerInfoEl.innerHTML = '';
+            document.getElementById('dual-exam1-title').textContent = exam1.name;
+            document.getElementById('dual-exam1-center').textContent = exam1.center || '—';
+            document.getElementById('dual-exam1-paper').textContent = exam1.paper || '—';
+            document.getElementById('dual-exam1-start-time-display').textContent = startTimeValue;
+            document.getElementById('dual-exam1-end-time-display').textContent = exam1End;
+            document.getElementById('dual-exam1-extra-end-time-display').textContent = exam1ExtraEnd;
+            document.getElementById('dual-exam2-title').textContent = exam2.name;
+            document.getElementById('dual-exam2-center').textContent = exam2.center || '—';
+            document.getElementById('dual-exam2-paper').textContent = exam2.paper || '—';
+            document.getElementById('dual-exam2-start-time-display').textContent = startTimeValue;
+            document.getElementById('dual-exam2-end-time-display').textContent = exam2End;
+            document.getElementById('dual-exam2-extra-end-time-display').textContent = exam2ExtraEnd;
+            document.getElementById('single-exam-view').classList.add('hidden');
+            document.getElementById('dual-exam-view').classList.remove('hidden');
+        } else {
+            const exam1End = calculateTime(startTimeValue, exam1.duration);
+            const exam1ExtraEnd = calculateTime(startTimeValue, Math.round(exam1.duration * 1.25));
+            document.getElementById('start-time-display').textContent = startTimeValue;
+            document.getElementById('end-time-display').textContent = exam1End;
+            document.getElementById('extra-end-time-display').textContent = exam1ExtraEnd;
+            headerTitleEl.textContent = exam1.name;
+            updateCurrentDate();
+            headerInfoEl.innerHTML = `
+                <div class="flex items-center justify-center gap-10 text-3xl text-blue-100 bg-white/5 inline-flex px-10 py-4 rounded-full backdrop-blur-sm border border-white/10 whitespace-nowrap">
+                    ${exam1.center ? `<div class="flex items-center gap-4"><span class="uppercase tracking-widest text-[10px] font-semibold opacity-60">Center No</span><span class="font-mono font-bold tracking-wider">${exam1.center}</span></div>` : ''}
+                    ${(exam1.center && exam1.paper) ? `<div class="w-px bg-white/20 h-10 self-center"></div>` : ''}
+                    ${exam1.paper ? `<div class="flex items-center gap-4"><span class="uppercase tracking-widest text-[10px] font-semibold opacity-60">Paper Code</span><span class="font-mono font-bold tracking-wider">${exam1.paper}</span></div>` : ''}
+                </div>`;
+            document.getElementById('single-exam-view').classList.remove('hidden');
+            document.getElementById('dual-exam-view').classList.add('hidden');
+        }
+        setAlignment('running');
+        document.getElementById('setup-state').classList.add('hidden');
+        document.getElementById('running-state').classList.remove('hidden');
+        updateSystemClock();
+    }
 
-            const tab1 = document.getElementById('exam-tab-1');
-            const tab2 = document.getElementById('exam-tab-2');
-            if (tab1) tab1.addEventListener('click', () => handleExamTabClick(1));
-            if (tab2) tab2.addEventListener('click', () => handleExamTabClick(2));
+    function resetExamInternal() {
+        document.getElementById('running-state').classList.add('hidden');
+        document.getElementById('setup-state').classList.remove('hidden');
+        document.getElementById('header-title').textContent = 'Exam Timer Setup';
+        document.getElementById('header-info').innerHTML = '<p class="text-blue-200 text-lg">Configure your exam details and schedule</p>';
+        document.getElementById('single-exam-view').classList.remove('hidden');
+        document.getElementById('dual-exam-view').classList.add('hidden');
+        document.querySelectorAll('input[name="exam-count"]').forEach(r => r.checked = r.value === '1');
+        handleExamCountChange();
+    }
 
-            ['exam-name-input', 'center-number-input', 'paper-code-input', 'duration-input'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.addEventListener('input', () => {
-                        readFormIntoConfig(currentEditingExam);
-                        if (id === 'duration-input') updateSetupTimes();
-                    });
+    function resetExam() {
+        setAlignment('setup');
+        resetExamInternal();
+    }
+
+    // ─────────────────────────────────────────────
+    //          COUNTDOWN LOOP TIMER LOGIC
+    // ─────────────────────────────────────────────
+    let countdownTotalSeconds = 0;
+    let countdownRemaining = 0;
+    let countdownLoopMode = 'infinite';
+    let countdownMaxLoops = 0;
+    let countdownCurrentLoop = 1;
+    let countdownCompletedLoops = 0;
+    let countdownInterval = null;
+    let countdownPaused = false;
+    let countdownFinished = false;
+
+    const RING_CIRCUMFERENCE = 2 * Math.PI * 126; // r=126 → 791.68
+
+    function toggleLoopMode(mode) {
+        countdownLoopMode = mode;
+        const wrapper = document.getElementById('loop-count-input-wrapper');
+        const summary = document.getElementById('loop-mode-summary');
+        const tabInf = document.getElementById('loop-tab-infinite');
+        const tabFin = document.getElementById('loop-tab-finite');
+        if (mode === 'infinite') {
+            wrapper.classList.add('hidden');
+            if (summary) summary.textContent = 'Will loop indefinitely until stopped';
+            tabInf.classList.add('bg-blue-600','text-white');
+            tabInf.classList.remove('text-blue-200');
+            tabFin.classList.remove('bg-blue-600','text-white');
+            tabFin.classList.add('text-blue-200');
+        } else {
+            wrapper.classList.remove('hidden');
+            const n = parseInt(document.getElementById('loop-count-input').value) || 3;
+            if (summary) summary.textContent = `Will run ${n} time${n !== 1 ? 's' : ''} then stop`;
+            tabFin.classList.add('bg-blue-600','text-white');
+            tabFin.classList.remove('text-blue-200');
+            tabInf.classList.remove('bg-blue-600','text-white');
+            tabInf.classList.add('text-blue-200');
+        }
+    }
+
+    function playBeep() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            [0.1, 0.4, 0.7, 1.0].forEach(offset => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.value = 880;
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0, ctx.currentTime + offset);
+                gain.gain.linearRampToValueAtTime(0.9, ctx.currentTime + offset + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + offset + 0.25);
+                osc.start(ctx.currentTime + offset);
+                osc.stop(ctx.currentTime + offset + 0.3);
+            });
+        } catch(e) { console.warn('Audio not available:', e); }
+    }
+
+    function formatCountdownTime(seconds) {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    }
+
+    function updateRing(remaining, total) {
+        const ring = document.getElementById('countdown-ring-el');
+        if (!ring) return;
+        const fraction = total > 0 ? remaining / total : 0;
+        ring.style.strokeDashoffset = RING_CIRCUMFERENCE * (1 - fraction);
+        ring.classList.remove('warning', 'danger');
+        if (fraction <= 0.1) ring.classList.add('danger');
+        else if (fraction <= 0.25) ring.classList.add('warning');
+    }
+
+    function buildLoopDots(total, current) {
+        const container = document.getElementById('loop-dots-container');
+        const label = document.getElementById('loop-dots-label');
+        if (!container) return;
+        if (countdownLoopMode === 'infinite' || total > 30) {
+            container.innerHTML = '<span class="text-slate-500 text-xs italic">Infinite — loops shown above</span>';
+            if (label) label.textContent = '';
+            return;
+        }
+        if (label) label.textContent = `${Math.min(current-1, total)} / ${total} done`;
+        container.innerHTML = '';
+        for (let i = 1; i <= total; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'loop-dot';
+            dot.id = `loop-dot-${i}`;
+            if (i < current) dot.classList.add('completed');
+            else if (i === current) dot.classList.add('active');
+            container.appendChild(dot);
+        }
+    }
+
+    function updateLoopDots(current) {
+        const label = document.getElementById('loop-dots-label');
+        if (countdownLoopMode === 'infinite' || countdownMaxLoops > 30) return;
+        if (label) label.textContent = `${Math.min(current-1, countdownMaxLoops)} / ${countdownMaxLoops} done`;
+        for (let i = 1; i <= countdownMaxLoops; i++) {
+            const dot = document.getElementById(`loop-dot-${i}`);
+            if (!dot) continue;
+            dot.className = 'loop-dot';
+            if (i < current) dot.classList.add('completed');
+            else if (i === current) dot.classList.add('active');
+        }
+    }
+
+    function startCountdown() {
+        const mins = parseInt(document.getElementById('countdown-minutes').value) || 0;
+        const secs = parseInt(document.getElementById('countdown-seconds').value) || 0;
+        const totalSecs = mins * 60 + secs;
+        if (totalSecs <= 0) { alert('Please enter a duration greater than 0.'); return; }
+
+        const header = document.getElementById('countdown-header-input').value || 'Countdown';
+        countdownMaxLoops = countdownLoopMode === 'finite' ? (parseInt(document.getElementById('loop-count-input').value) || 3) : 0;
+        countdownTotalSeconds = totalSecs;
+        countdownRemaining = totalSecs;
+        countdownCurrentLoop = 1;
+        countdownCompletedLoops = 0;
+        countdownPaused = false;
+        countdownFinished = false;
+
+        // Populate running view header
+        document.getElementById('countdown-display-header').textContent = header;
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        const dateRunEl = document.getElementById('countdown-date-running');
+        if (dateRunEl) dateRunEl.textContent = dateStr;
+
+        document.getElementById('countdown-time-display').textContent = formatCountdownTime(countdownRemaining);
+        document.getElementById('countdown-status-label').textContent = 'In Progress';
+        document.getElementById('countdown-finished').classList.add('hidden');
+        document.getElementById('pause-label').textContent = 'Pause';
+        document.getElementById('pause-icon').innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+
+        const loopText = countdownLoopMode === 'infinite' ? '1' : `1`;
+        document.getElementById('loop-counter-text').textContent = loopText;
+
+        buildLoopDots(countdownMaxLoops, 1);
+        updateRing(countdownRemaining, countdownTotalSeconds);
+
+        setAlignment('running');
+        document.getElementById('countdown-setup').classList.add('hidden');
+        document.getElementById('countdown-running').classList.remove('hidden');
+        document.getElementById('countdown-running').classList.add('slide-in');
+
+        stopCountdownTimer();
+        countdownInterval = setInterval(tickCountdown, 1000);
+    }
+
+    function tickCountdown() {
+        if (countdownPaused || countdownFinished) return;
+        countdownRemaining--;
+        document.getElementById('countdown-time-display').textContent = formatCountdownTime(countdownRemaining);
+        updateRing(countdownRemaining, countdownTotalSeconds);
+
+        if (countdownRemaining <= 0) {
+            playBeep();
+            countdownCompletedLoops++;
+
+            const display = document.getElementById('countdown-time-display');
+            display.classList.add('flash-complete');
+            setTimeout(() => display.classList.remove('flash-complete'), 1200);
+
+            const isLastLoop = countdownLoopMode === 'finite' && countdownCurrentLoop >= countdownMaxLoops;
+
+            if (isLastLoop) {
+                countdownFinished = true;
+                clearInterval(countdownInterval);
+                document.getElementById('countdown-status-label').textContent = 'Complete!';
+                document.getElementById('loop-counter-text').textContent = `${countdownMaxLoops} of ${countdownMaxLoops}`;
+                document.getElementById('countdown-finished').classList.remove('hidden');
+                document.getElementById('countdown-finished-text').textContent =
+                    `All ${countdownMaxLoops} loop${countdownMaxLoops !== 1 ? 's' : ''} completed successfully.`;
+                updateLoopDots(countdownCurrentLoop + 1);
+            } else {
+                countdownCurrentLoop++;
+                countdownRemaining = countdownTotalSeconds;
+                updateRing(countdownRemaining, countdownTotalSeconds);
+                const loopText = countdownLoopMode === 'infinite'
+                    ? `${countdownCurrentLoop}`
+                    : `${countdownCurrentLoop}`;
+                document.getElementById('loop-counter-text').textContent = loopText;
+                updateLoopDots(countdownCurrentLoop);
+                document.getElementById('countdown-status-label').textContent = 'In Progress';
+            }
+        }
+    }
+
+    function togglePause() {
+        if (countdownFinished) return;
+        countdownPaused = !countdownPaused;
+        const label = document.getElementById('pause-label');
+        const icon = document.getElementById('pause-icon');
+        if (countdownPaused) {
+            label.textContent = 'Resume';
+            icon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
+            document.getElementById('countdown-status-label').textContent = 'Paused';
+        } else {
+            label.textContent = 'Pause';
+            icon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+            document.getElementById('countdown-status-label').textContent = 'In Progress';
+        }
+    }
+
+    function skipLoop() {
+        if (countdownFinished) return;
+        countdownRemaining = 1;
+    }
+
+    function stopCountdownTimer() {
+        if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+    }
+
+    function resetCountdown() {
+        stopCountdownTimer();
+        countdownFinished = false;
+        countdownPaused = false;
+        setAlignment('setup');
+        document.getElementById('countdown-running').classList.add('hidden');
+        document.getElementById('countdown-setup').classList.remove('hidden');
+        document.getElementById('countdown-setup').classList.add('slide-in');
+    }
+
+    // ─────────────────────────────────────────────
+    //              INIT
+    // ─────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+        examConfigs[1].name = document.getElementById('exam-name-input').value || '';
+        examConfigs[1].center = document.getElementById('center-number-input').value || '';
+        examConfigs[1].paper = document.getElementById('paper-code-input').value || '';
+        examConfigs[1].duration = Number(document.getElementById('duration-input').value || 0);
+        examConfigs[2] = { name: 'A-Level Physics', center: examConfigs[1].center || '', paper: '9702/22', duration: 90 };
+
+        updateSystemClock();
+        setInterval(updateSystemClock, 1000);
+        updateSetupTimes();
+        setAlignment('setup');
+        setActiveExamTab(1);
+        handleExamCountChange();
+        updateCurrentDate();
+        setInterval(updateCurrentDate, 60000);
+
+        // Seed countdown date fields
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        ['countdown-date-setup','countdown-date-running'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = dateStr;
+        });
+
+        // Init loop mode UI
+        toggleLoopMode('infinite');
+
+        // Loop count summary live update
+        const loopCountInput = document.getElementById('loop-count-input');
+        if (loopCountInput) {
+            loopCountInput.addEventListener('input', () => {
+                if (countdownLoopMode === 'finite') {
+                    const n = parseInt(loopCountInput.value) || 1;
+                    const summary = document.getElementById('loop-mode-summary');
+                    if (summary) summary.textContent = `Will run ${n} time${n !== 1 ? 's' : ''} then stop`;
                 }
             });
-        });
-        function updateCurrentDate() {
-            const now = new Date();
-
-            const dateString = now.toLocaleDateString('en-GB', {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-            });
-
-            const headerDateEl = document.getElementById('header-date');
-            if (headerDateEl) {
-                headerDateEl.textContent = dateString;
-            }
-        }     
-        tailwind.config = {
-            theme: {
-            screens: {
-                sm: '640px',
-                md: '768px',
-                lg: '1024px',
-                xl: '1340px',   // changed from 1280px
-                '2xl': '1536px',
-            }
-            }
         }
 
-    </script>
+        const tab1 = document.getElementById('exam-tab-1');
+        const tab2 = document.getElementById('exam-tab-2');
+        if (tab1) tab1.addEventListener('click', () => handleExamTabClick(1));
+        if (tab2) tab2.addEventListener('click', () => handleExamTabClick(2));
+
+        document.querySelectorAll('input[name="exam-count"]').forEach(radio => {
+            radio.addEventListener('change', handleExamCountChange);
+        });
+
+        ['exam-name-input','center-number-input','paper-code-input','duration-input'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('input', () => {
+                    readFormIntoConfig(currentEditingExam);
+                    if (id === 'duration-input') updateSetupTimes();
+                });
+            }
+        });
+    });
+
+    tailwind.config = {
+        theme: {
+            screens: {
+                sm: '640px', md: '768px', lg: '1024px',
+                xl: '1340px', '2xl': '1536px',
+            }
+        }
+    }
+</script>
 </body>
 </html>
