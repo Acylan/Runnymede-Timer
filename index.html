@@ -395,7 +395,7 @@
         <!-- ═══════════════════════════════════════════════ -->
         <div id="countdown-mode" class="hidden">
 
-            <!-- Countdown Setup — mirrors exam setup-state styling exactly -->
+            <!-- Countdown Setup -->
             <div id="countdown-setup" class="slide-in">
                 <div class="text-center space-y-2 mb-4">
                     <h1 class="text-5xl md:text-7xl font-bold tracking-tight text-white drop-shadow-lg">Countdown Setup</h1>
@@ -479,9 +479,8 @@
                 </div>
             </div>
 
-            <!-- Countdown Running — mirrors exam running-state layout -->
+            <!-- Countdown Running -->
             <div id="countdown-running" class="hidden slide-in">
-                <!-- Header mirrors exam header exactly -->
                 <div class="text-center space-y-2 mb-4">
                     <h1 id="countdown-display-header" class="text-5xl md:text-7xl font-bold tracking-tight text-white drop-shadow-lg">Reading Time</h1>
                     <div id="countdown-date-running" class="text-2xl md:text-3xl text-blue-200 font-semibold"></div>
@@ -498,10 +497,9 @@
                     </div>
                 </div>
 
-                <!-- Main grid: countdown ring (left, 2/3) + info cards (right, 1/3) — mirrors single-exam-view -->
                 <div class="grid grid-cols-1 min-[1256px]:grid-cols-3 gap-6 max-w-[95vw] mx-auto">
 
-                    <!-- Left: ring + time — mirrors the large current-time card -->
+                    <!-- Left: ring + time -->
                     <div class="lg:col-span-2 bg-slate-800/40 backdrop-blur-xl border-2 border-blue-400/30 shadow-2xl overflow-hidden rounded-xl">
                         <div class="flex flex-col items-center justify-center p-8 md:p-12 h-full gap-4">
                             <div class="text-lg uppercase tracking-[0.2em] text-blue-300 font-semibold flex items-center gap-2">
@@ -521,7 +519,7 @@
                                 </div>
                             </div>
 
-                            <!-- Loop dots inside main card -->
+                            <!-- Loop dots -->
                             <div class="w-full max-w-sm space-y-2">
                                 <div class="flex items-center justify-between text-xs uppercase tracking-widest text-slate-400 font-semibold px-1">
                                     <span>Loop Progress</span>
@@ -532,9 +530,8 @@
                         </div>
                     </div>
 
-                    <!-- Right: info cards — mirrors the right column in single-exam-view -->
+                    <!-- Right: info cards -->
                     <div class="lg:col-span-1 flex flex-col gap-4">
-                        <!-- Current time card — same as exam's green start-time card -->
                         <div class="bg-slate-800/40 backdrop-blur-xl border border-green-500/20 shadow-xl rounded-xl opacity-90 flex-1 flex flex-col items-center justify-center">
                             <div class="flex flex-col items-center justify-center py-8 px-6">
                                 <div class="text-[16px] uppercase tracking-widest text-green-400/80 mb-2 font-[600]">Current Time</div>
@@ -542,7 +539,6 @@
                             </div>
                         </div>
 
-                        <!-- Controls card — same border/bg style as exam's blue end-time card -->
                         <div class="bg-slate-800/40 backdrop-blur-xl border border-blue-500/20 shadow-xl rounded-xl flex-1">
                             <div class="flex flex-col items-center justify-center py-8 px-6 gap-4 h-full">
                                 <div class="text-sm uppercase tracking-widest text-blue-400/80 font-semibold">Controls</div>
@@ -560,8 +556,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Finished / status card — mirrors amber extra-time card -->
                     </div>
 
                     <!-- All-done banner -->
@@ -647,16 +641,12 @@
     }
 
     function backToModeSelect() {
-        // Stop countdown if running
         stopCountdownTimer();
-
         document.getElementById('exam-mode').classList.add('hidden');
         document.getElementById('countdown-mode').classList.add('hidden');
         document.getElementById('mode-selection').classList.remove('hidden');
         document.getElementById('mode-selection').classList.add('slide-in');
         setAlignment('setup');
-
-        // Reset exam state
         resetExamInternal();
     }
 
@@ -850,24 +840,53 @@
         }
     }
 
+    // ── AUDIO ─────────────────────────────────────
+    // Loud, aggressive end-of-timer beep (5 square-wave pulses)
     function playBeep() {
         try {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            [0.1, 0.4, 0.7, 1.0].forEach(offset => {
+            const masterGain = ctx.createGain();
+            masterGain.gain.setValueAtTime(1.5, ctx.currentTime);
+            masterGain.connect(ctx.destination);
+            [0, 0.3, 0.6, 0.9, 1.2].forEach(offset => {
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.frequency.value = 880;
-                osc.type = 'sine';
+                gain.connect(masterGain);
+                osc.frequency.value = 1046; // high, piercing C6
+                osc.type = 'square';        // harsh buzzy tone
                 gain.gain.setValueAtTime(0, ctx.currentTime + offset);
-                gain.gain.linearRampToValueAtTime(0.9, ctx.currentTime + offset + 0.02);
-                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + offset + 0.25);
+                gain.gain.linearRampToValueAtTime(1.0, ctx.currentTime + offset + 0.01);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + offset + 0.28);
                 osc.start(ctx.currentTime + offset);
                 osc.stop(ctx.currentTime + offset + 0.3);
             });
         } catch(e) { console.warn('Audio not available:', e); }
     }
+
+    // 3 rapid short warning beeps at 10 seconds remaining
+    function playWarning() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const masterGain = ctx.createGain();
+            masterGain.gain.setValueAtTime(1.2, ctx.currentTime);
+            masterGain.connect(ctx.destination);
+            [0, 0.18, 0.36].forEach(offset => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(masterGain);
+                osc.frequency.value = 880; // A5
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0, ctx.currentTime + offset);
+                gain.gain.linearRampToValueAtTime(0.8, ctx.currentTime + offset + 0.01);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + offset + 0.14);
+                osc.start(ctx.currentTime + offset);
+                osc.stop(ctx.currentTime + offset + 0.15);
+            });
+        } catch(e) { console.warn('Audio not available:', e); }
+    }
+    // ─────────────────────────────────────────────
 
     function formatCountdownTime(seconds) {
         const m = Math.floor(seconds / 60);
@@ -934,7 +953,6 @@
         countdownPaused = false;
         countdownFinished = false;
 
-        // Populate running view header
         document.getElementById('countdown-display-header').textContent = header;
         const now = new Date();
         const dateStr = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
@@ -946,9 +964,7 @@
         document.getElementById('countdown-finished').classList.add('hidden');
         document.getElementById('pause-label').textContent = 'Pause';
         document.getElementById('pause-icon').innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
-
-        const loopText = countdownLoopMode === 'infinite' ? '1' : `1`;
-        document.getElementById('loop-counter-text').textContent = loopText;
+        document.getElementById('loop-counter-text').textContent = '1';
 
         buildLoopDots(countdownMaxLoops, 1);
         updateRing(countdownRemaining, countdownTotalSeconds);
@@ -967,6 +983,11 @@
         countdownRemaining--;
         document.getElementById('countdown-time-display').textContent = formatCountdownTime(countdownRemaining);
         updateRing(countdownRemaining, countdownTotalSeconds);
+
+        // 10-second warning — only fires if total duration is longer than 1 minute
+        if (countdownRemaining === 10 && countdownTotalSeconds >= 14) {
+            playWarning();
+        }
 
         if (countdownRemaining <= 0) {
             playBeep();
@@ -991,10 +1012,7 @@
                 countdownCurrentLoop++;
                 countdownRemaining = countdownTotalSeconds;
                 updateRing(countdownRemaining, countdownTotalSeconds);
-                const loopText = countdownLoopMode === 'infinite'
-                    ? `${countdownCurrentLoop}`
-                    : `${countdownCurrentLoop}`;
-                document.getElementById('loop-counter-text').textContent = loopText;
+                document.getElementById('loop-counter-text').textContent = `${countdownCurrentLoop}`;
                 updateLoopDots(countdownCurrentLoop);
                 document.getElementById('countdown-status-label').textContent = 'In Progress';
             }
@@ -1055,7 +1073,6 @@
         updateCurrentDate();
         setInterval(updateCurrentDate, 60000);
 
-        // Seed countdown date fields
         const now = new Date();
         const dateStr = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
         ['countdown-date-setup','countdown-date-running'].forEach(id => {
@@ -1063,10 +1080,8 @@
             if (el) el.textContent = dateStr;
         });
 
-        // Init loop mode UI
         toggleLoopMode('infinite');
 
-        // Loop count summary live update
         const loopCountInput = document.getElementById('loop-count-input');
         if (loopCountInput) {
             loopCountInput.addEventListener('input', () => {
