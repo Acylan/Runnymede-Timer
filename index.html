@@ -854,7 +854,7 @@
         return audioCtx;
     }
 
-    // Call once inside a real click event to unlock audio on Safari/macOS
+    // Plays a silent buffer — call this inside a real click to unlock AudioContext on Safari/macOS
     function unlockAudio() {
         try {
             const ctx = getAudioContext();
@@ -866,50 +866,64 @@
         } catch(e) { console.warn('Audio unlock failed:', e); }
     }
 
-    // Loud, aggressive end-of-timer beep (5 square-wave pulses)
+    // Schedule beep sounds at a specific AudioContext time (t = ctx.currentTime + offset)
+    function scheduleBeeps(ctx, startT, pulses, freq, type, pulseGap, pulseDuration, masterVol) {
+        const masterGain = ctx.createGain();
+        masterGain.gain.setValueAtTime(masterVol, startT);
+        masterGain.connect(ctx.destination);
+        for (let i = 0; i < pulses; i++) {
+            const t = startT + i * pulseGap;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(masterGain);
+            osc.frequency.value = freq;
+            osc.type = type;
+            gain.gain.setValueAtTime(0, t);
+            gain.gain.linearRampToValueAtTime(1.0, t + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + pulseDuration - 0.02);
+            osc.start(t);
+            osc.stop(t + pulseDuration);
+        }
+    }
+
+    // Called from setInterval — plays immediately using ctx.currentTime
     function playBeep() {
         try {
             const ctx = getAudioContext();
-            const masterGain = ctx.createGain();
-            masterGain.gain.setValueAtTime(1.5, ctx.currentTime);
-            masterGain.connect(ctx.destination);
-            [0, 0.3, 0.6, 0.9, 1.2].forEach(offset => {
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(masterGain);
-                osc.frequency.value = 1046;
-                osc.type = 'square';
-                gain.gain.setValueAtTime(0, ctx.currentTime + offset);
-                gain.gain.linearRampToValueAtTime(1.0, ctx.currentTime + offset + 0.01);
-                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + offset + 0.28);
-                osc.start(ctx.currentTime + offset);
-                osc.stop(ctx.currentTime + offset + 0.3);
-            });
+            scheduleBeeps(ctx, ctx.currentTime, 5, 1046, 'square', 0.3, 0.28, 1.5);
         } catch(e) { console.warn('Audio not available:', e); }
     }
 
-    // 3 rapid short warning beeps at 10 seconds remaining
     function playWarning() {
         try {
             const ctx = getAudioContext();
-            const masterGain = ctx.createGain();
-            masterGain.gain.setValueAtTime(1.2, ctx.currentTime);
-            masterGain.connect(ctx.destination);
-            [0, 0.18, 0.36].forEach(offset => {
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(masterGain);
-                osc.frequency.value = 880;
-                osc.type = 'sine';
-                gain.gain.setValueAtTime(0, ctx.currentTime + offset);
-                gain.gain.linearRampToValueAtTime(0.8, ctx.currentTime + offset + 0.01);
-                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + offset + 0.14);
-                osc.start(ctx.currentTime + offset);
-                osc.stop(ctx.currentTime + offset + 0.15);
-            });
+            scheduleBeeps(ctx, ctx.currentTime, 3, 880, 'sine', 0.18, 0.14, 1.2);
         } catch(e) { console.warn('Audio not available:', e); }
+    }
+
+    // Pre-schedules warning and end-beep on the AudioContext timeline at loop start.
+    // This bypasses any setInterval timing issues on macOS/Safari.
+    let scheduledSources = [];
+    function scheduleLoopAudio(totalSeconds) {
+        cancelScheduledAudio();
+        if (totalSeconds <= 0) return;
+        try {
+            const ctx = getAudioContext();
+            const now = ctx.currentTime;
+            // End-of-loop beep scheduled at exactly totalSeconds from now
+            scheduleBeeps(ctx, now + totalSeconds, 5, 1046, 'square', 0.3, 0.28, 1.5);
+            // 10-second warning — only if duration > 60s
+            if (totalSeconds > 60) {
+                scheduleBeeps(ctx, now + totalSeconds - 10, 3, 880, 'sine', 0.18, 0.14, 1.2);
+            }
+        } catch(e) { console.warn('Audio schedule failed:', e); }
+    }
+
+    function cancelScheduledAudio() {
+        // We can't cancel already-scheduled oscillators easily, so we just let them expire.
+        // To mute on skip/pause we recreate the AudioContext.
+        scheduledSources = [];
     }
     // ─────────────────────────────────────────────
 
@@ -1001,8 +1015,8 @@
         document.getElementById('countdown-running').classList.add('slide-in');
 
         stopCountdownTimer();
-        // Ensure context is running before interval starts
-        getAudioContext().resume().catch(() => {});
+        // Pre-schedule audio on the AudioContext timeline — immune to browser autoplay blocks
+        scheduleLoopAudio(countdownTotalSeconds);
         countdownInterval = setInterval(tickCountdown, 1000);
     }
 
@@ -1012,13 +1026,7 @@
         document.getElementById('countdown-time-display').textContent = formatCountdownTime(countdownRemaining);
         updateRing(countdownRemaining, countdownTotalSeconds);
 
-        // 10-second warning — only fires if total duration is longer than 1 minute
-        if (countdownRemaining === 10 && countdownTotalSeconds > 60) {
-            playWarning();
-        }
-
         if (countdownRemaining <= 0) {
-            playBeep();
             countdownCompletedLoops++;
 
             const display = document.getElementById('countdown-time-display');
@@ -1043,6 +1051,8 @@
                 document.getElementById('loop-counter-text').textContent = `${countdownCurrentLoop}`;
                 updateLoopDots(countdownCurrentLoop);
                 document.getElementById('countdown-status-label').textContent = 'In Progress';
+                // Pre-schedule audio for the next loop on the AudioContext timeline
+                scheduleLoopAudio(countdownTotalSeconds);
             }
         }
     }
