@@ -841,10 +841,34 @@
     }
 
     // ── AUDIO ─────────────────────────────────────
+    let audioCtx = null;
+
+    function getAudioContext() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        return audioCtx;
+    }
+
+    // Call once inside a real click event to unlock audio on Safari/macOS
+    function unlockAudio() {
+        try {
+            const ctx = getAudioContext();
+            const buf = ctx.createBuffer(1, 1, 22050);
+            const src = ctx.createBufferSource();
+            src.buffer = buf;
+            src.connect(ctx.destination);
+            src.start(0);
+        } catch(e) { console.warn('Audio unlock failed:', e); }
+    }
+
     // Loud, aggressive end-of-timer beep (5 square-wave pulses)
     function playBeep() {
         try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const ctx = getAudioContext();
             const masterGain = ctx.createGain();
             masterGain.gain.setValueAtTime(1.5, ctx.currentTime);
             masterGain.connect(ctx.destination);
@@ -853,8 +877,8 @@
                 const gain = ctx.createGain();
                 osc.connect(gain);
                 gain.connect(masterGain);
-                osc.frequency.value = 1046; // high, piercing C6
-                osc.type = 'square';        // harsh buzzy tone
+                osc.frequency.value = 1046;
+                osc.type = 'square';
                 gain.gain.setValueAtTime(0, ctx.currentTime + offset);
                 gain.gain.linearRampToValueAtTime(1.0, ctx.currentTime + offset + 0.01);
                 gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + offset + 0.28);
@@ -867,7 +891,7 @@
     // 3 rapid short warning beeps at 10 seconds remaining
     function playWarning() {
         try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const ctx = getAudioContext();
             const masterGain = ctx.createGain();
             masterGain.gain.setValueAtTime(1.2, ctx.currentTime);
             masterGain.connect(ctx.destination);
@@ -876,7 +900,7 @@
                 const gain = ctx.createGain();
                 osc.connect(gain);
                 gain.connect(masterGain);
-                osc.frequency.value = 880; // A5
+                osc.frequency.value = 880;
                 osc.type = 'sine';
                 gain.gain.setValueAtTime(0, ctx.currentTime + offset);
                 gain.gain.linearRampToValueAtTime(0.8, ctx.currentTime + offset + 0.01);
@@ -939,6 +963,7 @@
     }
 
     function startCountdown() {
+        unlockAudio(); // unlock Web Audio on this click event (required for Safari/macOS)
         const mins = parseInt(document.getElementById('countdown-minutes').value) || 0;
         const secs = parseInt(document.getElementById('countdown-seconds').value) || 0;
         const totalSecs = mins * 60 + secs;
@@ -985,7 +1010,7 @@
         updateRing(countdownRemaining, countdownTotalSeconds);
 
         // 10-second warning — only fires if total duration is longer than 1 minute
-        if (countdownRemaining === 10 && countdownTotalSeconds >= 14) {
+        if (countdownRemaining === 10 && countdownTotalSeconds > 60) {
             playWarning();
         }
 
