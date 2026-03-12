@@ -1000,7 +1000,7 @@
         updateRing(countdownRemaining, countdownTotalSeconds);
 
         // 10-second warning — use <= 10 + flag so a drifted setInterval can't skip it
-        if (countdownTotalSeconds > 60 && countdownRemaining <= 10 && countdownRemaining > 0 && !warningPlayed) {
+        if (countdownTotalSeconds >= 15 && countdownRemaining <= 10 && countdownRemaining > 0 && !warningPlayed) {
             warningPlayed = true;
             playWarning();
         }
