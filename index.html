@@ -630,6 +630,7 @@
     //              MODE SELECTION
     // ─────────────────────────────────────────────
     function selectMode(mode) {
+        unlockAudio(); // earliest user gesture — warm up AudioContext for Safari/macOS
         document.getElementById('mode-selection').classList.add('hidden');
         if (mode === 'exam') {
             document.getElementById('exam-mode').classList.remove('hidden');
@@ -1000,6 +1001,8 @@
         document.getElementById('countdown-running').classList.add('slide-in');
 
         stopCountdownTimer();
+        // Ensure context is running before interval starts
+        getAudioContext().resume().catch(() => {});
         countdownInterval = setInterval(tickCountdown, 1000);
     }
 
