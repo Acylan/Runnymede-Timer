@@ -117,6 +117,55 @@
             50% { border-color: rgba(59,130,246,0.8); }
         }
         .glow-border { animation: border-glow 2s ease-in-out infinite; }
+
+        /* Sound selector */
+        .sound-option {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+        .sound-option:hover {
+            border-color: rgba(59,130,246,0.5);
+            background: rgba(59,130,246,0.1);
+        }
+        .sound-option.selected {
+            border-color: rgba(59,130,246,0.8);
+            background: rgba(59,130,246,0.18);
+        }
+
+        /* Volume slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.1);
+            outline: none;
+            cursor: pointer;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(59,130,246,0.6);
+            transition: box-shadow 0.2s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            box-shadow: 0 0 14px rgba(59,130,246,0.9);
+        }
+        input[type=range]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 8px rgba(59,130,246,0.6);
+        }
     </style>
 </head>
 <body class="bg-slate-900">
@@ -463,6 +512,42 @@
                                 </div>
                             </div>
 
+                            <!-- ══════════════════════════════════════ -->
+                            <!--         SOUND SETTINGS SECTION        -->
+                            <!-- ══════════════════════════════════════ -->
+                            <div class="pt-2 space-y-4">
+                                <div class="flex items-center gap-3">
+                                    <label class="shadcn-label text-amber-300 tracking-wide">Sound Settings</label>
+                                </div>
+
+                                <!-- Volume slider + test button -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                                    <div class="space-y-3">
+                                        <div class="flex items-center justify-between">
+                                            <label class="text-xs uppercase tracking-widest text-slate-400 font-semibold">Volume</label>
+                                            <span id="volume-value-label" class="text-sm font-mono font-bold text-blue-300">100%</span>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                                            <input type="range" id="volume-slider" min="0" max="100" value="100"
+                                                   oninput="updateVolumeLabel(this.value)"
+                                                   class="flex-1"
+                                                   style="background: linear-gradient(to right, #3b82f6 100%, rgba(255,255,255,0.1) 100%)" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M12 6v12M9 9l-2 2H4v2h3l2 2V9z"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button type="button" onclick="previewBeep()" class="flex-1 h-11 bg-amber-600/30 hover:bg-amber-500/40 border border-amber-500/40 hover:border-amber-400/70 text-amber-200 rounded-xl font-semibold transition-all text-sm flex items-center justify-center gap-2">
+                                            Test End Alert
+                                        </button>
+                                        <button type="button" onclick="previewWarning()" class="flex-1 h-11 bg-blue-600/20 hover:bg-blue-500/30 border border-blue-500/30 hover:border-blue-400/60 text-blue-200 rounded-xl font-semibold transition-all text-sm flex items-center justify-center gap-2">
+                                            Test Warning
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- ══════════════════════════════════════ -->
+
                             <div class="pt-4 flex flex-col justify-center align-center">
                                 <button onclick="startCountdown()" type="button"
                                         class="w-full h-14 text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg rounded-lg flex items-center justify-center">
@@ -630,7 +715,7 @@
     //              MODE SELECTION
     // ─────────────────────────────────────────────
     function selectMode(mode) {
-        unlockAudio(); // earliest user gesture — warm up AudioContext for Safari/macOS
+        unlockAudio();
         document.getElementById('mode-selection').classList.add('hidden');
         if (mode === 'exam') {
             document.getElementById('exam-mode').classList.remove('hidden');
@@ -816,7 +901,7 @@
     let countdownFinished = false;
     let warningPlayed = false;
 
-    const RING_CIRCUMFERENCE = 2 * Math.PI * 126; // r=126 → 791.68
+    const RING_CIRCUMFERENCE = 2 * Math.PI * 126;
 
     function toggleLoopMode(mode) {
         countdownLoopMode = mode;
@@ -843,9 +928,8 @@
     }
 
     // ── AUDIO ─────────────────────────────────────
-    // ── AUDIO ─────────────────────────────────────
-    // One shared AudioContext, created and unlocked on the first user click.
     let audioCtx = null;
+    let selectedSound = 'chime';
 
     function getAudioContext() {
         if (!audioCtx) {
@@ -854,13 +938,10 @@
         return audioCtx;
     }
 
-    // Call inside every user gesture to keep the context running on Safari/macOS.
     function unlockAudio() {
         try {
             const ctx = getAudioContext();
-            // Resume if suspended
             if (ctx.state === 'suspended') ctx.resume();
-            // Play a silent buffer to satisfy Safari's gesture requirement
             const buf = ctx.createBuffer(1, 1, 22050);
             const src = ctx.createBufferSource();
             src.buffer = buf;
@@ -869,36 +950,193 @@
         } catch(e) { console.warn('Audio unlock failed:', e); }
     }
 
-    // Core: plays N beeps immediately via the shared AudioContext.
-    function playSound(pulses, freq, type, pulseGap, pulseDuration, vol) {
+    function getVolume() {
+        const slider = document.getElementById('volume-slider');
+        // Base volume × 3 for 3× louder, then scaled by slider (0–100)
+        return (slider ? slider.value / 100 : 1.0) * 4.5;
+    }
+
+    function updateVolumeLabel(val) {
+        const label = document.getElementById('volume-value-label');
+        if (label) label.textContent = val + '%';
+        // Update slider fill
+        const slider = document.getElementById('volume-slider');
+        if (slider) {
+            slider.style.background = `linear-gradient(to right, #3b82f6 ${val}%, rgba(255,255,255,0.1) ${val}%)`;
+        }
+    }
+
+    // ── SOUND GENERATORS ──────────────────────────
+
+    function playSound_bell(isWarning) {
+        // Rich bell: sine + triangle layered, natural decay
         try {
             const ctx = getAudioContext();
             if (ctx.state === 'suspended') ctx.resume();
+            const vol = getVolume();
             const t = ctx.currentTime;
-            const masterGain = ctx.createGain();
-            masterGain.gain.setValueAtTime(vol, t);
-            masterGain.connect(ctx.destination);
+            const master = ctx.createGain();
+            master.gain.setValueAtTime(vol, t);
+            master.connect(ctx.destination);
+
+            const pulses = isWarning ? 3 : 5;
+            const gap = isWarning ? 0.22 : 0.35;
+            const freqs = isWarning ? [1318, 1047] : [1047, 1319, 1568];
+
             for (let i = 0; i < pulses; i++) {
-                const start = t + i * pulseGap;
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(masterGain);
-                osc.frequency.value = freq;
-                osc.type = type;
-                gain.gain.setValueAtTime(0, start);
-                gain.gain.linearRampToValueAtTime(1.0, start + 0.01);
-                gain.gain.exponentialRampToValueAtTime(0.001, start + pulseDuration - 0.02);
-                osc.start(start);
-                osc.stop(start + pulseDuration);
+                const start = t + i * gap;
+                freqs.forEach((freq, fi) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain); gain.connect(master);
+                    osc.type = fi === 0 ? 'sine' : 'triangle';
+                    osc.frequency.value = freq * (fi === 0 ? 1 : 0.5);
+                    gain.gain.setValueAtTime(0, start);
+                    gain.gain.linearRampToValueAtTime(fi === 0 ? 1.0 : 0.3, start + 0.015);
+                    gain.gain.exponentialRampToValueAtTime(0.001, start + (isWarning ? 0.5 : 0.7));
+                    osc.start(start);
+                    osc.stop(start + (isWarning ? 0.55 : 0.75));
+                });
             }
         } catch(e) { console.warn('Audio error:', e); }
     }
 
-    // 5 loud square-wave pulses — end of timer
-    function playBeep()    { playSound(5, 1046, 'square', 0.3,  0.28, 1.5); }
-    // 3 short sine pulses — 10-second warning
-    function playWarning() { playSound(3,  880, 'sine',   0.18, 0.14, 1.2); }
+    function playSound_alarm(isWarning) {
+        // Urgent square + sawtooth sweep
+        try {
+            const ctx = getAudioContext();
+            if (ctx.state === 'suspended') ctx.resume();
+            const vol = getVolume();
+            const t = ctx.currentTime;
+            const master = ctx.createGain();
+            master.gain.setValueAtTime(vol * 0.7, t);
+            master.connect(ctx.destination);
+
+            const pulses = isWarning ? 3 : 5;
+            const gap = isWarning ? 0.2 : 0.28;
+
+            for (let i = 0; i < pulses; i++) {
+                const start = t + i * gap;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain); gain.connect(master);
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(isWarning ? 880 : 660, start);
+                osc.frequency.linearRampToValueAtTime(isWarning ? 1100 : 880, start + 0.12);
+                gain.gain.setValueAtTime(0, start);
+                gain.gain.linearRampToValueAtTime(1.0, start + 0.01);
+                gain.gain.setValueAtTime(1.0, start + 0.12);
+                gain.gain.exponentialRampToValueAtTime(0.001, start + 0.2);
+                osc.start(start);
+                osc.stop(start + 0.22);
+            }
+        } catch(e) { console.warn('Audio error:', e); }
+    }
+
+    function playSound_chime(isWarning) {
+        // Ascending musical notes
+        try {
+            const ctx = getAudioContext();
+            if (ctx.state === 'suspended') ctx.resume();
+            const vol = getVolume();
+            const t = ctx.currentTime;
+            const master = ctx.createGain();
+            master.gain.setValueAtTime(vol, t);
+            master.connect(ctx.destination);
+
+            const scale = isWarning
+                ? [523, 659, 784]
+                : [523, 659, 784, 1047, 1319];
+            const noteLen = 0.28;
+
+            scale.forEach((freq, i) => {
+                const start = t + i * 0.18;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain); gain.connect(master);
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0, start);
+                gain.gain.linearRampToValueAtTime(0.9, start + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.001, start + noteLen + 0.3);
+                osc.start(start);
+                osc.stop(start + noteLen + 0.35);
+            });
+        } catch(e) { console.warn('Audio error:', e); }
+    }
+
+    function playSound_buzz(isWarning) {
+        // Deep horn / foghorn style with vibrato
+        try {
+            const ctx = getAudioContext();
+            if (ctx.state === 'suspended') ctx.resume();
+            const vol = getVolume();
+            const t = ctx.currentTime;
+            const master = ctx.createGain();
+            master.gain.setValueAtTime(vol * 0.8, t);
+            master.connect(ctx.destination);
+
+            const pulses = isWarning ? 2 : 3;
+            const durations = isWarning ? [0.25, 0.25] : [0.5, 0.3, 0.8];
+            const gaps = isWarning ? [0, 0.35] : [0, 0.65, 1.05];
+            const baseFreq = isWarning ? 220 : 110;
+
+            pulses; // keep ref
+            for (let i = 0; i < (isWarning ? 2 : 3); i++) {
+                const start = t + gaps[i];
+                const dur = durations[i];
+
+                // Main osc
+                const osc = ctx.createOscillator();
+                const lfo = ctx.createOscillator();
+                const lfoGain = ctx.createGain();
+                const gain = ctx.createGain();
+
+                lfo.frequency.value = 6;
+                lfo.type = 'sine';
+                lfoGain.gain.value = 8;
+                lfo.connect(lfoGain);
+                lfoGain.connect(osc.frequency);
+
+                osc.connect(gain); gain.connect(master);
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(baseFreq, start);
+                osc.frequency.linearRampToValueAtTime(baseFreq * 1.15, start + dur * 0.5);
+
+                gain.gain.setValueAtTime(0, start);
+                gain.gain.linearRampToValueAtTime(1.0, start + 0.04);
+                gain.gain.setValueAtTime(1.0, start + dur - 0.05);
+                gain.gain.linearRampToValueAtTime(0, start + dur);
+
+                lfo.start(start); lfo.stop(start + dur + 0.1);
+                osc.start(start); osc.stop(start + dur + 0.1);
+            }
+        } catch(e) { console.warn('Audio error:', e); }
+    }
+
+    function playBeep() {
+        if (selectedSound === 'bell')  playSound_bell(false);
+        else if (selectedSound === 'alarm') playSound_alarm(false);
+        else if (selectedSound === 'chime') playSound_chime(false);
+        else if (selectedSound === 'buzz')  playSound_buzz(false);
+    }
+
+    function playWarning() {
+        if (selectedSound === 'bell')  playSound_bell(true);
+        else if (selectedSound === 'alarm') playSound_alarm(true);
+        else if (selectedSound === 'chime') playSound_chime(true);
+        else if (selectedSound === 'buzz')  playSound_buzz(true);
+    }
+
+    function previewBeep() {
+        unlockAudio();
+        playBeep();
+    }
+
+    function previewWarning() {
+        unlockAudio();
+        playWarning();
+    }
     // ─────────────────────────────────────────────
 
     function formatCountdownTime(seconds) {
@@ -952,7 +1190,7 @@
     }
 
     function startCountdown() {
-        unlockAudio(); // unlock Web Audio on this click event (required for Safari/macOS)
+        unlockAudio();
         const mins = parseInt(document.getElementById('countdown-minutes').value) || 0;
         const secs = parseInt(document.getElementById('countdown-seconds').value) || 0;
         const totalSecs = mins * 60 + secs;
@@ -999,7 +1237,6 @@
         document.getElementById('countdown-time-display').textContent = formatCountdownTime(countdownRemaining);
         updateRing(countdownRemaining, countdownTotalSeconds);
 
-        // 10-second warning — use <= 10 + flag so a drifted setInterval can't skip it
         if (countdownTotalSeconds >= 15 && countdownRemaining <= 10 && countdownRemaining > 0 && !warningPlayed) {
             warningPlayed = true;
             playWarning();
